@@ -28,4 +28,6 @@ class APIClient {
         return retrofit;
     }
 
+    // TODO create custom Gson serializer: http://stackoverflow.com/questions/23070298/get-nested-json-object-with-gson-using-retrofit
+
 }
