@@ -5,8 +5,9 @@ import java.util.List;
 
 /**
  * Created by Alessandro on 01/05/2017.
+ *
  */
-
-public class ChildrenList {
+public class ChildrenList extends GeneralResponse<ChildrenList> {
     private List<Child> children = new ArrayList<>();
+
 }

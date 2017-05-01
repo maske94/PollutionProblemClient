@@ -7,11 +7,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Alessandro on 01/05/2017.
+ *
  */
 class APIClient {
 
-    private static final String API_BASE_URL = "https://reqres.in";
-    private static Retrofit retrofit = null;
+    private static final String API_BASE_URL = "http://localhost:3000";
 
     static Retrofit getClient() {
 
@@ -19,15 +19,10 @@ class APIClient {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-        retrofit = new Retrofit.Builder()
+        return new Retrofit.Builder()
                 .baseUrl(API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-
-        return retrofit;
     }
-
-    // TODO create custom Gson serializer: http://stackoverflow.com/questions/23070298/get-nested-json-object-with-gson-using-retrofit
-
 }

@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Alessandro on 01/05/2017.
+ *
  */
-
-public class Event {
+public class Event extends GeneralResponse<Event>{
     @SerializedName("_id")
     private String eventId;
 
@@ -91,5 +91,18 @@ public class Event {
 
     public void setGpsLong(String gpsLong) {
         this.gpsLong = gpsLong;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventId='" + eventId + '\'' +
+                ", username='" + username + '\'' +
+                ", childId='" + childId + '\'' +
+                ", pollutionValue='" + pollutionValue + '\'' +
+                ", timeStamp='" + timeStamp + '\'' +
+                ", gpsLat='" + gpsLat + '\'' +
+                ", gpsLong='" + gpsLong + '\'' +
+                '}';
     }
 }

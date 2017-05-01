@@ -1,8 +1,8 @@
 package com.supsi.alessandro.pollutionproblemclient.api;
 
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Child;
-import com.supsi.alessandro.pollutionproblemclient.api.pojo.ChildrenList;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
+import com.supsi.alessandro.pollutionproblemclient.api.pojo.GeneralResponse;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.User;
 
 import retrofit2.Call;
@@ -13,21 +13,22 @@ import retrofit2.http.Query;
 
 /**
  * Created by Alessandro on 01/05/2017.
+ *
  */
 interface APIInterface {
 
     @POST("/api/addUser")
-    Call<User> addUser(@Body User user);
+    Call<GeneralResponse> addUser(@Body User user);
 
     @POST("/api/addChild")
-    Call<Child> addChild(@Body Child child);
+    Call<GeneralResponse> addChild(@Body Child child);
 
     @POST("/api/addEvent")
-    Call<Event> addEvent(@Body Event event);
+    Call<GeneralResponse> addEvent(@Body Event event);
 
     @GET("/api/getChild?")
-    Call<Child> getChild(@Query("username") String parentUsername, @Query("childId") String childId);
+    Call<GeneralResponse> getChild(@Query("username") String parentUsername, @Query("childId") String childId);
 
-    @POST("/api/getChildren?")
-    Call<ChildrenList> getChildrenList(@Query("username") String parentUsername);
+    @GET("/api/getChildren?")
+    Call<GeneralResponse> getChildrenList(@Query("username") String parentUsername);
 }

@@ -6,9 +6,9 @@ import java.util.Date;
 
 /**
  * Created by Alessandro on 01/05/2017.
+ *
  */
-
-public class Child {
+public class Child extends GeneralResponse<Child> {
     @SerializedName("_id")
     private String childId;
 
@@ -67,5 +67,16 @@ public class Child {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+    }
+
+    @Override
+    public String toString() {
+        return "Child{" +
+                "childId='" + childId + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthDate=" + birthDate +
+                ", deviceId='" + deviceId + '\'' +
+                '}';
     }
 }

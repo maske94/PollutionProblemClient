@@ -8,8 +8,9 @@ import java.util.List;
 
 /**
  * Created by Alessandro on 01/05/2017.
+ *
  */
-public class User {
+public class User extends GeneralResponse<User> {
     @SerializedName("username")
     private String username;
 
@@ -96,5 +97,18 @@ public class User {
 
     public void setChildren(List<Child> children) {
         this.children = children;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", birthDate=" + birthDate +
+                ", city='" + city + '\'' +
+                ", children=" + children +
+                '}';
     }
 }
