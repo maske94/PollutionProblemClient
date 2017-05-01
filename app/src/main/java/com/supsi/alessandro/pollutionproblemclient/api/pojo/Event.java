@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by Alessandro on 01/05/2017.
  *
  */
-public class Event extends GeneralResponse<Event>{
+public class Event{
     @SerializedName("_id")
     private String eventId;
 

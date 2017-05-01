@@ -10,7 +10,7 @@ import java.util.List;
  * Created by Alessandro on 01/05/2017.
  *
  */
-public class User extends GeneralResponse<User> {
+public class User{
     @SerializedName("username")
     private String username;
 

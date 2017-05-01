@@ -25,6 +25,18 @@ public class GeneralResponse<T> {
     @SerializedName("message")
     private String message;
 
+    public T getBody() {
+        return body;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
     @Override
     public String toString() {
         return "GeneralResponse{" +

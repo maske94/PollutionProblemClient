@@ -2,13 +2,11 @@ package com.supsi.alessandro.pollutionproblemclient.api.pojo;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Date;
-
 /**
  * Created by Alessandro on 01/05/2017.
  *
  */
-public class Child extends GeneralResponse<Child> {
+public class Child{
     @SerializedName("_id")
     private String childId;
 
@@ -19,7 +17,7 @@ public class Child extends GeneralResponse<Child> {
     private String lastName;
 
     @SerializedName("birthDate")
-    private Date birthDate;
+    private String birthDate;
 
     @SerializedName("deviceId")
     private String deviceId;
@@ -53,11 +51,11 @@ public class Child extends GeneralResponse<Child> {
         this.lastName = lastName;
     }
 
-    public Date getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 
