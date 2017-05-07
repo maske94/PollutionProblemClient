@@ -56,7 +56,7 @@ public class getChildrenTest {
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
-        assertEquals("The given username does not exist", response.getError());
+        assertEquals(APIConstants.ERROR_USERNAME_NOT_EXIST, response.getError());
     }
 
     @Test
@@ -66,6 +66,6 @@ public class getChildrenTest {
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
-        assertEquals("Missed mandatory 'username' field in the request", response.getError());
+        assertEquals(APIConstants.ERROR_MISSING_FIELD_USERNAME, response.getError());
     }
 }

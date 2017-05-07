@@ -3,7 +3,6 @@ package com.supsi.alessandro.pollutionproblemclient.api.pojo;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,7 +23,7 @@ public class User{
     private String lastName;
 
     @SerializedName("birthDate")
-    private Date birthDate;
+    private String birthDate;
 
     @SerializedName("city")
     private String city;
@@ -34,7 +33,7 @@ public class User{
 
     // children is not in the constructor because the API doesn't require the children field when
     // creating a new user
-    public User(String username, String password, String firstName, String lastName, Date birthDate, String city) {
+    public User(String username, String password, String firstName, String lastName, String birthDate, String city) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -75,11 +74,11 @@ public class User{
         this.lastName = lastName;
     }
 
-    public Date getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 

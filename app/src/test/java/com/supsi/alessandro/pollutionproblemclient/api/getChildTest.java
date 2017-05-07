@@ -40,7 +40,7 @@ public class getChildTest {
         assertEquals("asfw5twrvsdgf5", child.getDeviceId());
         assertEquals("58e656ce3b37a828401f4183", child.getChildId());
         assertEquals("1994-05-03T00:00:00.000Z", child.getBirthDate());
-        assertEquals("Successful operation", response.getMessage());
+        assertEquals(APIConstants.SUCCESS_GENERAL, response.getMessage());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class getChildTest {
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
-        assertEquals("Missed mandatory 'username' field in the request", response.getError());
+        assertEquals(APIConstants.ERROR_MISSING_FIELD_USERNAME, response.getError());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class getChildTest {
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
-        assertEquals("The given username does not exist", response.getError());
+        assertEquals(APIConstants.ERROR_USERNAME_NOT_EXIST, response.getError());
     }
 
     @Test
@@ -71,6 +71,6 @@ public class getChildTest {
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
-        assertEquals("The given childId does not exist for parent '"+parentUsername+"'", response.getError());
+        assertEquals(APIConstants.ERROR_CHILDID_NOT_EXIST+"'"+parentUsername+"'", response.getError());
     }
 }
