@@ -17,6 +17,7 @@ import static junit.framework.Assert.assertNull;
 /**
  * Created by Alessandro on 01/05/2017.
  *
+ * This class tests the /api/getChild API call.
  */
 public class getChildTest {
 
