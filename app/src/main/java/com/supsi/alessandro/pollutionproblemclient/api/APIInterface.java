@@ -15,6 +15,7 @@ import retrofit2.http.Query;
 /**
  * Created by Alessandro on 01/05/2017.
  *
+ * This interface contains methods necessary to perform requests towards our API
  */
 interface APIInterface {
 

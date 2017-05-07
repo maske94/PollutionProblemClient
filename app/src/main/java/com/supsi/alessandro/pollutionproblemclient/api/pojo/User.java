@@ -33,7 +33,7 @@ public class User{
     private List<Child> children = new ArrayList<>();
 
     // children is not in the constructor because the API doesn't require the children field when
-    // creating new user
+    // creating a new user
     public User(String username, String password, String firstName, String lastName, Date birthDate, String city) {
         this.username = username;
         this.password = password;
