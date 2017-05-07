@@ -20,9 +20,8 @@ import static junit.framework.Assert.assertNull;
  */
 public class getChildTest {
 
-    private GeneralResponse<Child> res = null;
+    private GeneralResponse<Child> response = null;
     private APIInterface apiInterface = null;
-    private Call<GeneralResponse<Child>> call = null;
 
     @Before
     public void setUp() throws IOException {
@@ -31,50 +30,46 @@ public class getChildTest {
 
     @Test
     public void childIsCorrect() throws Exception {
-        call = apiInterface.getChild("paperino", "58e656ce3b37a828401f4183");
-        res = call.execute().body();
+        response = apiInterface.getChild("paperino", "58e656ce3b37a828401f4183").execute().body();
 
-        Child child = res.getBody();
+        Child child = response.getBody();
         // expected,actual
         assertEquals("luca2", child.getLastName());
         assertEquals("masche", child.getFirstName());
         assertEquals("asfw5twrvsdgf5", child.getDeviceId());
         assertEquals("58e656ce3b37a828401f4183", child.getChildId());
         assertEquals("1994-05-03T00:00:00.000Z", child.getBirthDate());
-        assertEquals("Successful operation", res.getMessage());
+        assertEquals("Successful operation", response.getMessage());
     }
 
     @Test
     public void parentUsernameIsNull() throws Exception {
         // Send to the API a null parent username
-        call = apiInterface.getChild(null, "58e656ce3b37a828401f4183");
-        res = call.execute().body();
+        response = apiInterface.getChild(null, "58e656ce3b37a828401f4183").execute().body();
 
-        assertNull(res.getBody());
-        assertNotNull(res.getError());
-        assertEquals("Missed mandatory 'username' field in the request", res.getError());
+        assertNull(response.getBody());
+        assertNotNull(response.getError());
+        assertEquals("Missed mandatory 'username' field in the request", response.getError());
     }
 
     @Test
     public void parentUsernameDoesNotExist() throws Exception {
         // Send to the API a parent username that does not exist
-        call = apiInterface.getChild("fuffa", "58e656ce3b37a828401f4183");
-        res = call.execute().body();
+        response = apiInterface.getChild("fuffa", "58e656ce3b37a828401f4183").execute().body();
 
-        assertNull(res.getBody());
-        assertNotNull(res.getError());
-        assertEquals("The given username does not exist", res.getError());
+        assertNull(response.getBody());
+        assertNotNull(response.getError());
+        assertEquals("The given username does not exist", response.getError());
     }
 
     @Test
     public void childIdDoesNotExist() throws Exception {
         // Send to the API a parent username that does not exist
         String parentUsername = "paperino";
-        call = apiInterface.getChild(parentUsername, "idthatdoesnotexist");
-        res = call.execute().body();
+        response = apiInterface.getChild(parentUsername, "idthatdoesnotexist").execute().body();
 
-        assertNull(res.getBody());
-        assertNotNull(res.getError());
-        assertEquals("The given childId does not exist for parent '"+parentUsername+"'", res.getError());
+        assertNull(response.getBody());
+        assertNotNull(response.getError());
+        assertEquals("The given childId does not exist for parent '"+parentUsername+"'", response.getError());
     }
 }

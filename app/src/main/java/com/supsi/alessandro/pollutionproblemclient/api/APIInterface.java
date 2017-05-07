@@ -18,7 +18,6 @@ import retrofit2.http.Query;
  * This interface contains methods necessary to perform requests towards our API
  */
 interface APIInterface {
-
     @POST("/api/addUser")
     Call<GeneralResponse<User>> addUser(@Body User user);
 
