@@ -4,6 +4,7 @@ import com.supsi.alessandro.pollutionproblemclient.api.pojo.GeneralResponse;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.User;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,18 +25,20 @@ import static junit.framework.Assert.assertTrue;
  */
 public class addUserTest {
 
-    private GeneralResponse<User> response = null;
-    private APIInterface apiInterface = null;
+    private static GeneralResponse<User> response = null;
+    private static APIInterface apiInterface = null;
+    private static final String TEST_USERNAME = "maske94";
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeClass
+    public static void setUp() throws IOException {
         apiInterface = APIClient.getClient().create(APIInterface.class);
-        //TODO remove username maske94 before run these tests
+        // This is to make sure that the following tests has not already a user with the given username
+        response = apiInterface.deleteUser(TEST_USERNAME).execute().body();
     }
 
     @Test
     public void addedUserIsCorrect() throws IOException, ParseException {
-        User userToAdd = new User("maske94", "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo");
+        User userToAdd = new User(TEST_USERNAME, "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo");
         response = apiInterface.addUser(userToAdd).execute().body();
         User addedUser = response.getBody();
 
@@ -56,7 +59,7 @@ public class addUserTest {
 
     @Test
     public void usernameAlreadyExist() throws IOException {
-        User userToAdd = new User("maske94", "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo");
+        User userToAdd = new User(TEST_USERNAME, "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo");
         response = apiInterface.addUser(userToAdd).execute().body();
 
         assertNull(response.getBody());
@@ -66,7 +69,7 @@ public class addUserTest {
 
     @Test
     public void invalidBirthDateFormat() throws IOException {
-        User userToAdd = new User("maske94", "pass", "Alessandro", "Mascheroni", "invalidDate", "Dongo");
+        User userToAdd = new User(TEST_USERNAME, "pass", "Alessandro", "Mascheroni", "invalidDate", "Dongo");
         response = apiInterface.addUser(userToAdd).execute().body();
 
         assertNull(response.getBody());

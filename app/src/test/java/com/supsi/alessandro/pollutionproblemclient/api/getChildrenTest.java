@@ -4,6 +4,7 @@ import com.supsi.alessandro.pollutionproblemclient.api.pojo.Child;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.GeneralResponse;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -22,10 +23,10 @@ import static junit.framework.Assert.assertNull;
 public class getChildrenTest {
 
     private GeneralResponse<List<Child>> response = null;
-    private APIInterface apiInterface = null;
+    private static APIInterface apiInterface = null;
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeClass
+    public static void setUp() throws IOException {
         apiInterface = APIClient.getClient().create(APIInterface.class);
     }
 

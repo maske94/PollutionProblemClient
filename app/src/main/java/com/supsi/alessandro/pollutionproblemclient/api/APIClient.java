@@ -14,7 +14,7 @@ class APIClient {
     static Retrofit getClient() {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);//Level.BODY to see log
+        interceptor.setLevel(HttpLoggingInterceptor.Level.NONE);//Level.BODY to see log
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         return new Retrofit.Builder()

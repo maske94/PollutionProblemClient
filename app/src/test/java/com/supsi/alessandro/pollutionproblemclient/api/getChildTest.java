@@ -3,12 +3,10 @@ package com.supsi.alessandro.pollutionproblemclient.api;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Child;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.GeneralResponse;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-
-import retrofit2.Call;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -16,16 +14,16 @@ import static junit.framework.Assert.assertNull;
 
 /**
  * Created by Alessandro on 01/05/2017.
- *
+ * <p>
  * This class tests the /api/getChild API call.
  */
 public class getChildTest {
 
     private GeneralResponse<Child> response = null;
-    private APIInterface apiInterface = null;
+    private static APIInterface apiInterface = null;
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeClass
+    public static void setUp() throws IOException {
         apiInterface = APIClient.getClient().create(APIInterface.class);
     }
 
@@ -71,6 +69,6 @@ public class getChildTest {
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
-        assertEquals(APIConstants.ERROR_CHILDID_NOT_EXIST+"'"+parentUsername+"'", response.getError());
+        assertEquals(APIConstants.ERROR_CHILDID_NOT_EXIST + "'" + parentUsername + "'", response.getError());
     }
 }
