@@ -10,15 +10,13 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
-import retrofit2.http.Field;
 import retrofit2.http.GET;
-import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
  * Created by Alessandro on 01/05/2017.
- *
+ * <p>
  * This interface contains methods necessary to perform requests towards our API
  */
 interface APIInterface {
@@ -38,10 +36,9 @@ interface APIInterface {
     Call<GeneralResponse<List<Child>>> getChildrenList(@Query("username") String parentUsername);
 
     @DELETE("/api/removeChild")
-    Call<GeneralResponse<Child>> deleteChild(@Query("username") String parentUsername,@Query("childId") String childId);
+    Call<GeneralResponse<Child>> deleteChild(@Query("username") String parentUsername, @Query("childId") String childId);
 
-    @HTTP(method = "DELETE", path = "/api/removeUser", hasBody = true)
-    //@DELETE("/api/removeUser")
+    @DELETE("/api/removeUser")
     Call<GeneralResponse<User>> deleteUser(@Query("username") String parentUsername);
 
 }

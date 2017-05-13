@@ -27,7 +27,7 @@ public class addUserTest {
 
     private static GeneralResponse<User> response = null;
     private static APIInterface apiInterface = null;
-    private static final String TEST_USERNAME = "maske94";
+    private static final String TEST_USERNAME = "addUsertest";
 
     @BeforeClass
     public static void setUp() throws IOException {

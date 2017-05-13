@@ -4,9 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Alessandro on 01/05/2017.
- *
  */
-public class Child{
+public class Child {
+
+    @SerializedName("username")
+    private String username;
+
     @SerializedName("_id")
     private String childId;
 
@@ -22,9 +25,18 @@ public class Child{
     @SerializedName("deviceId")
     private String deviceId;
 
-    public Child(String firstName,String deviceId){
-        this.firstName=firstName;
-        this.deviceId=deviceId;
+    public Child(String username,String firstName, String deviceId) {
+        this.username = username;
+        this.firstName = firstName;
+        this.deviceId = deviceId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getChildId() {
