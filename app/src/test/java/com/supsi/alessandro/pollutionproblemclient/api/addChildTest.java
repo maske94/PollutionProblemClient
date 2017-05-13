@@ -46,6 +46,7 @@ public class addChildTest {
         response = apiInterface.addChild(childToAdd).execute().body();
         Child addedChild = response.getBody();
 
+        assertEquals(APIConstants.SUCCESS_CHILD_ADDED+"'"+childToAdd.getParentUsername()+"'",response.getMessage());
         assertEquals(childToAdd.getFirstName(), addedChild.getFirstName());
         assertEquals(childToAdd.getDeviceId(), addedChild.getDeviceId());
         assertNull(addedChild.getBirthDate());

@@ -27,7 +27,7 @@ public class addUserTest {
 
     private static GeneralResponse<User> response = null;
     private static APIInterface apiInterface = null;
-    private static final String TEST_USERNAME = "addUsertest";
+    private static final String TEST_USERNAME = "addUserTest";
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -48,6 +48,7 @@ public class addUserTest {
 
         assertTrue(date1.compareTo(date2) == 0);
 
+        assertEquals(APIConstants.SUCCESS_USER_ADDED,response.getMessage());
         assertEquals(userToAdd.getUsername(), addedUser.getUsername());
         assertEquals(userToAdd.getPassword(), addedUser.getPassword());
         assertEquals(userToAdd.getFirstName(), addedUser.getFirstName());

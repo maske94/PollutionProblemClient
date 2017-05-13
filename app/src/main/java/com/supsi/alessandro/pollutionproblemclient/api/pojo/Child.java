@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 public class Child {
 
     @SerializedName("username")
-    private String username;
+    private String parentUsername;
 
     @SerializedName("_id")
     private String childId;
@@ -25,18 +25,18 @@ public class Child {
     @SerializedName("deviceId")
     private String deviceId;
 
-    public Child(String username,String firstName, String deviceId) {
-        this.username = username;
+    public Child(String parentUsername, String firstName, String deviceId) {
+        this.parentUsername = parentUsername;
         this.firstName = firstName;
         this.deviceId = deviceId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getParentUsername() {
+        return parentUsername;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setParentUsername(String parentUsername) {
+        this.parentUsername = parentUsername;
     }
 
     public String getChildId() {
