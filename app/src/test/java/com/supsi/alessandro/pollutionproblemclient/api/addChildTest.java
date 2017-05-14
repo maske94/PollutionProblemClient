@@ -35,7 +35,7 @@ public class addChildTest {
     public void beforeEachTest() throws IOException {
         // This two calls ensure that next tests start always from the same state
         // I.E. a user without any children associated
-        apiInterface.deleteUser(TEST_USERNAME).execute();
+        apiInterface.removeUser(TEST_USERNAME).execute();
         apiInterface.addUser(new User(TEST_USERNAME, "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo")).execute();
     }
 

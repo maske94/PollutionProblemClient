@@ -28,7 +28,7 @@ class APIConstants {
     static final String SUCCESS_USER_ADDED = "User added successfully";
     static final String SUCCESS_EVENT_ADDED = "Event added successfully";
     static final String SUCCESS_CHILD_ADDED = "Child added successfully to the parent ";
-    static final String SUCCESS_CHILD_REMOVED = "Child removed successfully from the parent";
+    static final String SUCCESS_CHILD_REMOVED = "Child removed successfully from the parent ";
     static final String SUCCESS_USER_REMOVED = "User removed successfully";
 
 }

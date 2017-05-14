@@ -36,9 +36,9 @@ interface APIInterface {
     Call<GeneralResponse<List<Child>>> getChildrenList(@Query("username") String parentUsername);
 
     @DELETE("/api/removeChild")
-    Call<GeneralResponse<Child>> deleteChild(@Query("username") String parentUsername, @Query("childId") String childId);
+    Call<GeneralResponse<Child>> removeChild(@Query("username") String parentUsername, @Query("childId") String childId);
 
     @DELETE("/api/removeUser")
-    Call<GeneralResponse<User>> deleteUser(@Query("username") String parentUsername);
+    Call<GeneralResponse<User>> removeUser(@Query("username") String parentUsername);
 
 }

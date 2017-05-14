@@ -3,7 +3,6 @@ package com.supsi.alessandro.pollutionproblemclient.api;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.GeneralResponse;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.User;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class addUserTest {
     public static void setUp() throws IOException {
         apiInterface = APIClient.getClient().create(APIInterface.class);
         // This is to make sure that the following tests has not already a user with the given username
-        response = apiInterface.deleteUser(TEST_USERNAME).execute().body();
+        response = apiInterface.removeUser(TEST_USERNAME).execute().body();
     }
 
     @Test

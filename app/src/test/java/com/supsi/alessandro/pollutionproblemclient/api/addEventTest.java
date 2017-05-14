@@ -33,7 +33,7 @@ public class addEventTest {
 
     @Before
     public void beforeEachTest() throws IOException {
-        apiInterface.deleteUser(TEST_USERNAME).execute();
+        apiInterface.removeUser(TEST_USERNAME).execute();
         apiInterface.addUser(new User(TEST_USERNAME, "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo")).execute();
         Child child =  apiInterface.addChild(new Child(TEST_USERNAME,"Richard","sdfv")).execute().body().getBody();
         childId = child.getChildId();

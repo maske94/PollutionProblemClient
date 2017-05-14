@@ -22,11 +22,11 @@ import static junit.framework.Assert.assertTrue;
  * Created by Alessandro on 14/05/2017.
  */
 
-public class deleteUserTest {
+public class removeUserTest {
 
     private static GeneralResponse<User> response = null;
     private static APIInterface apiInterface = null;
-    private static final String TEST_USERNAME = "deleteUserTest";
+    private static final String TEST_USERNAME = "removeUserTest";
 
     @BeforeClass
     public static void setUp() throws IOException {
@@ -38,7 +38,7 @@ public class deleteUserTest {
         User userToDelete = new User(TEST_USERNAME, "pass", "Alessandro", "Mascheroni", "1994-05-04", "Dongo");
         apiInterface.addUser(userToDelete).execute();
 
-        response = apiInterface.deleteUser(userToDelete.getUsername()).execute().body();
+        response = apiInterface.removeUser(userToDelete.getUsername()).execute().body();
         User deletedUser = response.getBody();
 
         assertEquals(APIConstants.SUCCESS_USER_REMOVED, response.getMessage());
@@ -56,8 +56,8 @@ public class deleteUserTest {
     }
 
     @Test
-    public void missedUsernameFiled() throws IOException {
-        response = apiInterface.deleteUser(null).execute().body();
+    public void missedUsernameField() throws IOException {
+        response = apiInterface.removeUser(null).execute().body();
 
         assertNull(response.getBody());
         assertNotNull(response.getError());
@@ -66,13 +66,11 @@ public class deleteUserTest {
 
     @Test
     public void parentUsernameDoesNotExist() throws IOException {
-        response = apiInterface.deleteUser("usernameThatDoesNotExist").execute().body();
+        response = apiInterface.removeUser("usernameThatDoesNotExist").execute().body();
 
         assertNull(response.getBody());
         assertNull(response.getMessage());
         assertNotNull(response.getError());
         assertEquals(APIConstants.ERROR_USERNAME_NOT_EXIST, response.getError());
     }
-
-
 }
