@@ -35,6 +35,9 @@ interface APIInterface {
     @GET("/api/getChildren?")
     Call<GeneralResponse<List<Child>>> getChildrenList(@Query("username") String parentUsername);
 
+    @GET("/api/getEvents")
+    Call<GeneralResponse<List<Event>>> getEvents(@Query("username") String parentUsername,@Query("childId") String childId,@Query("dateStart") String dateStart,@Query("dateEnd") String dateEnd);
+
     @DELETE("/api/removeChild")
     Call<GeneralResponse<Child>> removeChild(@Query("username") String parentUsername, @Query("childId") String childId);
 
