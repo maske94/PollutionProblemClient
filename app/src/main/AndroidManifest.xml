@@ -4,8 +4,17 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Allows bluetooth connections and data exchange -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+
+    <!-- Allows bluetooth devices discovery and bluetooth settings manipulation -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <!-- Ensure the this app is available to BLE capable devices only -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+
     <application
-        android:name=".PollutionProblemClientApplication"
+        android:name=".PollutionApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
