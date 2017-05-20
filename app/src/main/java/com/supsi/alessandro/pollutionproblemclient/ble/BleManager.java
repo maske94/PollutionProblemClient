@@ -8,12 +8,13 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.util.Log;
 
-import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 
 import java.util.List;
@@ -28,7 +29,8 @@ import java.util.List;
 
 class BleManager {
 
-    private static final BleManager mBleManagerInstance = new BleManager();
+    private static final String TAG = BleManager.class.getSimpleName() ;
+    private static final BleManager mInstance = new BleManager();
     private BluetoothAdapter mBluetoothAdapter;
 
     private BleManager() {
@@ -37,8 +39,8 @@ class BleManager {
         mBluetoothAdapter = bluetoothManager.getAdapter();
     }
 
-    public static BleManager getInstance() {
-        return mBleManagerInstance;
+    static BleManager getInstance() {
+        return mInstance;
     }
 
     /**
@@ -46,7 +48,7 @@ class BleManager {
      *
      * @return true if bluetooth is enabled, false otherwise
      */
-    public boolean isBleEnabled() {
+    boolean isBleEnabled() {
         return mBluetoothAdapter.isEnabled();
     }
 
@@ -59,7 +61,7 @@ class BleManager {
     public void enableBle(Activity activity) {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBtIntent, Constants.REQUEST_ENABLE_BT);
+            activity.startActivityForResult(enableBtIntent, BleConstants.REQUEST_ENABLE_BT);
         }
     }
 
@@ -71,7 +73,7 @@ class BleManager {
      * @param scanSettings
      * @param scanCallback
      */
-    public void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
+    void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
 
         final BluetoothLeScanner mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         mBluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback);
@@ -80,9 +82,19 @@ class BleManager {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.i(TAG, "stopScan()");
                 mBluetoothLeScanner.stopScan(scanCallback);
             }
-        }, Constants.SCAN_PERIOD);
+        }, BleConstants.SCAN_PERIOD);
+    }
+
+    /**
+     * Stop the ble devices scanning.
+     *
+     * @param scanCallback
+     */
+    void stopBleScan(ScanCallback scanCallback){
+        mBluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
     }
 
     /**
