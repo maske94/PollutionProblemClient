@@ -3,6 +3,7 @@ package com.supsi.alessandro.pollutionproblemclient.ble;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
@@ -80,12 +81,16 @@ public class PollutionBleCentral {
      */
     private class BleScanCallBack extends ScanCallback {
 
+        private boolean enabled = true;
+
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-            Log.i(TAG, "onScanResult() ---> " + result.getDevice().getName());
-            // TODO create a boolean variable in order to stop immediately the can
-            mBleManager.stopBleScan(this);
-            mBleManager.connectToDevice(result.getDevice(), new BleConnectionCallback());
+            if(enabled) { // Used to immediately stop the scan result callback.
+                Log.i(TAG, "onScanResult() ---> " + result.getDevice().getName());
+                mBleManager.stopBleScan(this);
+                mBleManager.connectToDevice(result.getDevice(), new BleConnectionCallback());
+                enabled = false;
+            }
         }
 
         @Override
@@ -130,9 +135,14 @@ public class PollutionBleCentral {
                         Log.i(TAG, "                                     ---> characteristic UUID :" + c.getUuid());
                         // Check for the wanted characteristic
                         if (UUID.fromString(BleConstants.HEART_RATE_MEASUREMENT_UUID).equals(c.getUuid())) {
-                            Log.i(TAG, "                                     ---> Found the wanted characteristic " + c.getUuid() + " , trying to read it...");
-                            gatt.readCharacteristic(c);
-                            //gatt.setCharacteristicNotification(c,true);
+                            Log.i(TAG, "                                     ---> Found the wanted characteristic " + c.getUuid() + " , enabling notification...");
+                            //gatt.readCharacteristic(c);
+                            gatt.setCharacteristicNotification(c, true);
+                            // 0x2902 org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
+                            UUID uuid = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
+                            BluetoothGattDescriptor descriptor = c.getDescriptor(uuid);
+                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            gatt.writeDescriptor(descriptor);
                         }
                     }
                 }
@@ -158,6 +168,24 @@ public class PollutionBleCentral {
             }
         }
 
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            Log.i(TAG, "onCharacteristicChanged()");
+            Log.i(TAG, "                           ---> " + characteristic.getUuid());
 
+            if (UUID.fromString(BleConstants.HEART_RATE_MEASUREMENT_UUID).equals(characteristic.getUuid())) {
+                int flag = characteristic.getProperties();
+                int format = -1;
+                if ((flag & 0x01) != 0) {
+                    format = BluetoothGattCharacteristic.FORMAT_UINT16;
+                    //Log.d(TAG, "                           ---> Heart rate format UINT16.");
+                } else {
+                    format = BluetoothGattCharacteristic.FORMAT_UINT8;
+                    //Log.d(TAG, "                           ---> Heart rate format UINT8.");
+                }
+                final int heartRate = characteristic.getIntValue(format, 1);
+                Log.d(TAG, "                           ---> Received heart rate: " + heartRate);
+            }
+        }
     }
 }
