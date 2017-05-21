@@ -1,5 +1,9 @@
 package com.supsi.alessandro.pollutionproblemclient.ble;
 
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
@@ -21,8 +25,8 @@ import java.util.UUID;
 
 public class PollutionBleCentral {
 
-    private static final PollutionBleCentral mInstance = new PollutionBleCentral();
     private static final String TAG = PollutionBleCentral.class.getSimpleName();
+    private static final PollutionBleCentral mInstance = new PollutionBleCentral();
     private BleManager mBleManager;
 
     private PollutionBleCentral() {
@@ -33,28 +37,41 @@ public class PollutionBleCentral {
         return mInstance;
     }
 
+    /**
+     *
+     */
     public void discoverPollutionDevices() {
         if (mBleManager.isBleEnabled()) {
 
             Log.i(TAG, "discoverPollutionDevices() ---> Ble is enabled");
 
             List<ScanFilter> scanFilters = buildScanFilters();
-
-            ScanSettings settings = new ScanSettings.Builder()
-                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                    .build();
+            ScanSettings settings = buildScanSettings();
 
             mBleManager.startBleScan(scanFilters, settings, new BleScanCallBack());
         } else {
             Log.i(TAG, "discoverPollutionDevices() ---> Ble is NOT enabled");
         }
-
     }
 
+    /**
+     * @return
+     */
+    private ScanSettings buildScanSettings() {
+        return new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build();
+    }
+
+    /**
+     * @return
+     */
     @NonNull
     private List<ScanFilter> buildScanFilters() {
         List<ScanFilter> scanFilters = new ArrayList<>();
-        scanFilters.add(new ScanFilter.Builder().setServiceUuid(new ParcelUuid(UUID.fromString(BleConstants.SERVICE_TO_DISCOVER_UUID))).build());
+        scanFilters.add(new ScanFilter.Builder()
+                .setServiceUuid(new ParcelUuid(UUID.fromString(BleConstants.SERVICE_TO_DISCOVER_UUID)))
+                .build());
         return scanFilters;
     }
 
@@ -62,23 +79,85 @@ public class PollutionBleCentral {
      *
      */
     private class BleScanCallBack extends ScanCallback {
+
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             Log.i(TAG, "onScanResult() ---> " + result.getDevice().getName());
+            // TODO create a boolean variable in order to stop immediately the can
             mBleManager.stopBleScan(this);
-            super.onScanResult(callbackType, result);
+            mBleManager.connectToDevice(result.getDevice(), new BleConnectionCallback());
         }
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
             Log.i(TAG, "onBatchScanResults()");
-            super.onBatchScanResults(results);
         }
 
         @Override
         public void onScanFailed(int errorCode) {
             Log.i(TAG, "onScanFailed()");
-            super.onScanFailed(errorCode);
         }
+    }
+
+    /**
+     *
+     */
+    private class BleConnectionCallback extends BluetoothGattCallback {
+
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (BluetoothGatt.GATT_SUCCESS == status) {
+                if (BluetoothGatt.STATE_CONNECTED == newState) {
+                    Log.i(TAG, "onConnectionStateChange() ---> Connected to " + gatt.getDevice().getName());
+                    gatt.discoverServices();
+                } else if (BluetoothGatt.STATE_DISCONNECTED == newState) {
+                    Log.i(TAG, "onConnectionStateChange() ---> Disconnected from " + gatt.getDevice().getName());
+                }
+            }
+        }
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            List<BluetoothGattService> services = gatt.getServices();
+            Log.i(TAG, "onServicesDiscovered() ---> " + gatt.getDevice().getName() + " has " + services.size() + " services.");
+            for (BluetoothGattService s : services) {
+                Log.i(TAG, "                   ---> new service UUID: " + s.getUuid());
+                // Force the characteristics read for each service of the defined type
+                if (UUID.fromString(BleConstants.SERVICE_TO_DISCOVER_UUID).equals(s.getUuid())) {
+                    List<BluetoothGattCharacteristic> characteristics = s.getCharacteristics();
+                    Log.i(TAG, "                              ---> characteristics number :" + characteristics.size());
+                    for (BluetoothGattCharacteristic c : characteristics) {
+                        Log.i(TAG, "                                     ---> characteristic UUID :" + c.getUuid());
+                        // Check for the wanted characteristic
+                        if (UUID.fromString(BleConstants.HEART_RATE_MEASUREMENT_UUID).equals(c.getUuid())) {
+                            Log.i(TAG, "                                     ---> Found the wanted characteristic " + c.getUuid() + " , trying to read it...");
+                            gatt.readCharacteristic(c);
+                            //gatt.setCharacteristicNotification(c,true);
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            Log.i(TAG, "onCharacteristicRead() ---> " + characteristic.getUuid());
+
+            if (UUID.fromString(BleConstants.HEART_RATE_MEASUREMENT_UUID).equals(characteristic.getUuid())) {
+                int flag = characteristic.getProperties();
+                int format = -1;
+                if ((flag & 0x01) != 0) {
+                    format = BluetoothGattCharacteristic.FORMAT_UINT16;
+                    Log.d(TAG, "onCharacteristicRead() ---> Heart rate format UINT16.");
+                } else {
+                    format = BluetoothGattCharacteristic.FORMAT_UINT8;
+                    Log.d(TAG, "onCharacteristicRead() ---> Heart rate format UINT8.");
+                }
+                final int heartRate = characteristic.getIntValue(format, 1);
+                Log.d(TAG, "onCharacteristicRead() ---> Received heart rate: " + heartRate);
+            }
+        }
+
+
     }
 }
