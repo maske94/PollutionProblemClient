@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +28,7 @@ import java.util.List;
 
 class BleManager {
 
-    private static final String TAG = BleManager.class.getSimpleName() ;
+    private static final String TAG = BleManager.class.getSimpleName();
     private static final BleManager mInstance = new BleManager();
     private BluetoothAdapter mBluetoothAdapter;
 
@@ -93,7 +92,7 @@ class BleManager {
      *
      * @param scanCallback
      */
-    void stopBleScan(ScanCallback scanCallback){
+    void stopBleScan(ScanCallback scanCallback) {
         mBluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
     }
 
@@ -103,7 +102,9 @@ class BleManager {
      * @param device
      * @param mBluetoothGattCallback
      */
-    public void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback){
-        device.connectGatt(PollutionApplication.getAppContext(),false,mBluetoothGattCallback);
+    void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
+        device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
     }
+
+
 }

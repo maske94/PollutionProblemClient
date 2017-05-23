@@ -10,6 +10,9 @@
     <!-- Allows bluetooth devices discovery and bluetooth settings manipulation -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
+    <!-- Needed  for BLE from Android 6 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <!-- Ensure the this app is available to BLE capable devices only -->
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 

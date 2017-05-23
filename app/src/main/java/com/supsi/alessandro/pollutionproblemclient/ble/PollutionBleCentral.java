@@ -1,5 +1,7 @@
 package com.supsi.alessandro.pollutionproblemclient.ble;
 
+import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -9,8 +11,11 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.pm.PackageManager;
 import android.os.ParcelUuid;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -39,12 +44,14 @@ public class PollutionBleCentral {
     }
 
     /**
-     *
+     * Starts a ble discovery
      */
-    public void discoverPollutionDevices() {
+    public void discoverPollutionDevices(Activity activity) {
         if (mBleManager.isBleEnabled()) {
-
             Log.i(TAG, "discoverPollutionDevices() ---> Ble is enabled");
+
+            if(!askForCoarseLocationPermission(activity))
+                return;
 
             List<ScanFilter> scanFilters = buildScanFilters();
             ScanSettings settings = buildScanSettings();
@@ -52,6 +59,7 @@ public class PollutionBleCentral {
             mBleManager.startBleScan(scanFilters, settings, new BleScanCallBack());
         } else {
             Log.i(TAG, "discoverPollutionDevices() ---> Ble is NOT enabled");
+            mBleManager.enableBle(activity);
         }
     }
 
@@ -77,7 +85,25 @@ public class PollutionBleCentral {
     }
 
     /**
+     * If the target sdk version is >= api 23 ( Android 6 (M) )
+     * Asks to the user for permission to access the coarse location.
+     * This is needed from Android 6 to read ble scanning results.
      *
+     * @param activity The activity from where the request is launched
+     * @return True if the permission was already granted, false otherwise
+     */
+    public boolean askForCoarseLocationPermission(Activity activity) {
+        if (android.os.Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    BleConstants.PERMISSIONS_REQUEST_COARSE_LOCATION);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Callback called when a ble device is discovered
      */
     private class BleScanCallBack extends ScanCallback {
 
@@ -85,7 +111,7 @@ public class PollutionBleCentral {
 
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-            if(enabled) { // Used to immediately stop the scan result callback.
+            if (enabled) { // Used to immediately stop the scan result callback.
                 Log.i(TAG, "onScanResult() ---> " + result.getDevice().getName());
                 mBleManager.stopBleScan(this);
                 mBleManager.connectToDevice(result.getDevice(), new BleConnectionCallback());
@@ -105,7 +131,7 @@ public class PollutionBleCentral {
     }
 
     /**
-     *
+     * Callback called when connected to a ble device
      */
     private class BleConnectionCallback extends BluetoothGattCallback {
 
