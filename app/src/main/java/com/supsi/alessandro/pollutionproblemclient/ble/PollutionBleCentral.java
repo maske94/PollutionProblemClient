@@ -159,7 +159,6 @@ public class PollutionBleCentral {
                             /**
                              * Enabling notification for the given characteristic
                              */
-                            //gatt.readCharacteristic(c);
                             mBleManager.enableNotification(gatt, c);
                         }
                     }

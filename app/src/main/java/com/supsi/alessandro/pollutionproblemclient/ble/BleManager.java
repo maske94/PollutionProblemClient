@@ -37,9 +37,6 @@ import java.util.UUID;
 class BleManager {
 
     private static final String TAG = BleManager.class.getSimpleName();
-
-
-
     private static final BleManager mInstance = new BleManager();
     private BluetoothAdapter mBluetoothAdapter;
 
@@ -110,10 +107,21 @@ class BleManager {
     /**
      * Connects to a ble peripheral device.
      *
-     * @param device
-     * @param mBluetoothGattCallback
+     * @param device The peripheral device
+     * @param mBluetoothGattCallback The callback to call after connecting
      */
     void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
+        device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
+    }
+
+    /**
+     * Connects to a ble peripheral device.
+     *
+     * @param deviceAddress The mac address of the ble peripheral device
+     * @param mBluetoothGattCallback The callback to call after connecting
+     */
+    void connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
         device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
     }
 
@@ -141,7 +149,7 @@ class BleManager {
      * @param activity The activity from where the request is launched
      * @return True if the permission was already granted, false otherwise
      */
-    public boolean askForCoarseLocationPermission(Activity activity) {
+    boolean askForCoarseLocationPermission(Activity activity) {
         if (android.os.Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
