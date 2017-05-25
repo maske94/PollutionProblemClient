@@ -40,16 +40,14 @@ class BleManager {
 
     private static final String TAG = BleManager.class.getSimpleName();
     private static final BleManager mInstance = new BleManager();
-    private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothGatt mBluetoothGatt;
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private BluetoothGatt mBluetoothGatt = null;
 
     /**
-     *
+     * Private constructor in order to implement singleton pattern
      */
     private BleManager() {
-        // Initializes Bluetooth adapter.
-        final BluetoothManager bluetoothManager = (BluetoothManager) PollutionApplication.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = bluetoothManager.getAdapter();
+
     }
 
     /**
@@ -61,11 +59,27 @@ class BleManager {
     }
 
     /**
+     * Initializes the Bluetooth adapter.
+     */
+    public void initialize(){
+        if(mBluetoothAdapter==null){
+            final BluetoothManager bluetoothManager = (BluetoothManager) PollutionApplication.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
+            mBluetoothAdapter = bluetoothManager.getAdapter();
+        }else{
+            Log.w(TAG, "initialize() ---> Bluetooth adapter is already initialized");
+        }
+    }
+
+    /**
      * Check whether the ble is enabled or not.
      *
      * @return true if bluetooth is enabled, false otherwise
      */
     boolean isBleEnabled() {
+        if(mBluetoothAdapter==null){
+            Log.w(TAG, "isBleEnabled() ---> bluetooth adapter NOT initialized");
+            return false;
+        }
         return mBluetoothAdapter.isEnabled();
     }
 
@@ -75,7 +89,12 @@ class BleManager {
      *
      * @param activity activity from where start the new activity
      */
-    void enableBle(Activity activity) {
+    void askBleEnabling(Activity activity) {
+        if(mBluetoothAdapter==null){
+            Log.w(TAG, "askBleEnabling() ---> bluetooth adapter NOT initialized");
+            return;
+        }
+
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             activity.startActivityForResult(enableBtIntent, BleConstants.REQUEST_ENABLE_BT);
@@ -92,6 +111,11 @@ class BleManager {
      */
     void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
 
+        if(mBluetoothAdapter==null){
+            Log.w(TAG, "startBleScan() ---> bluetooth adapter NOT initialized");
+            return;
+        }
+
         final BluetoothLeScanner mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
         mBluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback);
 
@@ -99,7 +123,7 @@ class BleManager {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG, "stopScan()");
+                Log.i(TAG, "stop scan after "+BleConstants.SCAN_PERIOD+ " milliseconds");
                 mBluetoothLeScanner.stopScan(scanCallback);
             }
         }, BleConstants.SCAN_PERIOD);
@@ -111,6 +135,11 @@ class BleManager {
      * @param scanCallback Callback to call after stop the scan
      */
     void stopBleScan(ScanCallback scanCallback) {
+        if(mBluetoothAdapter==null){
+            Log.w(TAG, "stopBleScan() ---> bluetooth adapter NOT initialized");
+            return;
+        }
+
         mBluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
     }
 
@@ -121,6 +150,11 @@ class BleManager {
      * @param mBluetoothGattCallback The callback to call after connecting
      */
     void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
+        if(mBluetoothAdapter==null){
+            Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
+            return;
+        }
+
         mBluetoothGatt = device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
     }
 
@@ -133,6 +167,12 @@ class BleManager {
      *         False if the given address doesn't exist or in not reachable
      */
     boolean connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
+
+        if(mBluetoothAdapter==null){
+            Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
+            return false;
+        }
+
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
         if (device == null) {
             Log.w(TAG, "connectToDevice() ---> Device address not found.  Unable to connect.");
@@ -149,8 +189,8 @@ class BleManager {
      * callback.
      */
     public void disconnect() {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
+        if(mBluetoothAdapter==null || mBluetoothGatt==null){
+            Log.w(TAG, "isBleEnabled() ---> bluetooth adapter or bluetooth gatt NOT initialized");
             return;
         }
         mBluetoothGatt.disconnect();
@@ -162,10 +202,12 @@ class BleManager {
      */
     public void close() {
         if (mBluetoothGatt == null) {
+            Log.w(TAG, "close() ---> bluetooth gatt NOT initialized");
             return;
         }
         mBluetoothGatt.close();
         mBluetoothGatt = null;
+        mBluetoothAdapter = null;
     }
 
     /**
@@ -175,6 +217,7 @@ class BleManager {
      * @param c the characteristic to enable the notification
      */
     void enableNotification(BluetoothGatt gatt, BluetoothGattCharacteristic c) {
+        //TODO use the bluetooth gatt of this class and not that one pass as parameter
         gatt.setCharacteristicNotification(c, true);
         // Get the configuration descriptor and enable the notification
         // 0x2902 org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml

@@ -23,7 +23,6 @@ import java.util.UUID;
  * Discovers and connects with pollution wearable devices only, by exploiting BleManager.java
  * Reads services and characteristics.
  */
-
 public class PollutionBleCentral {
 
     private static final String TAG = PollutionBleCentral.class.getSimpleName();
@@ -58,7 +57,7 @@ public class PollutionBleCentral {
             mBleManager.startBleScan(scanFilters, settings, new BleScanCallBack());
         } else {
             Log.i(TAG, "discoverPollutionDevices() ---> Ble is NOT enabled");
-            mBleManager.enableBle(activity);
+            mBleManager.askBleEnabling(activity);
         }
     }
 
