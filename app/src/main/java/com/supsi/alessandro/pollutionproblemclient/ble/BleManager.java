@@ -29,9 +29,11 @@ import java.util.UUID;
 /**
  * Created by Alessandro on 20/05/2017.
  * <p>
+ * Singleton class for:
+ *
  * BLE settings manipulation.
  * BLE devices discovery.
- * BLE devices connection.
+ * BLE devices connection/disconnection.
  */
 
 class BleManager {
@@ -39,13 +41,21 @@ class BleManager {
     private static final String TAG = BleManager.class.getSimpleName();
     private static final BleManager mInstance = new BleManager();
     private BluetoothAdapter mBluetoothAdapter;
+    private BluetoothGatt mBluetoothGatt;
 
+    /**
+     *
+     */
     private BleManager() {
         // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager = (BluetoothManager) PollutionApplication.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
     }
 
+    /**
+     *
+     * @return A singleton instance of this class
+     */
     static BleManager getInstance() {
         return mInstance;
     }
@@ -76,9 +86,9 @@ class BleManager {
      * Starts a ble scanning with the new BluetoothLeScanner object available from API 21.
      * After a defined period stops automatically the scan, in order to save battery life.
      *
-     * @param scanFilters
-     * @param scanSettings
-     * @param scanCallback
+     * @param scanFilters Filters to apply during the scan
+     * @param scanSettings Scan settings
+     * @param scanCallback Callback to call after the scan
      */
     void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
 
@@ -98,7 +108,7 @@ class BleManager {
     /**
      * Stop the ble devices scanning.
      *
-     * @param scanCallback
+     * @param scanCallback Callback to call after stop the scan
      */
     void stopBleScan(ScanCallback scanCallback) {
         mBluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
@@ -111,7 +121,7 @@ class BleManager {
      * @param mBluetoothGattCallback The callback to call after connecting
      */
     void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
-        device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
+        mBluetoothGatt = device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
     }
 
     /**
@@ -119,10 +129,43 @@ class BleManager {
      *
      * @param deviceAddress The mac address of the ble peripheral device
      * @param mBluetoothGattCallback The callback to call after connecting
+     * @return True if the device if found and it's possible to start a connection
+     *         False if the given address doesn't exist or in not reachable
      */
-    void connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
+    boolean connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
-        device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
+        if (device == null) {
+            Log.w(TAG, "connectToDevice() ---> Device address not found.  Unable to connect.");
+            return false;
+        }
+        mBluetoothGatt = device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
+        return true;
+    }
+
+    /**
+     * Disconnects an existing connection or cancel a pending connection. The disconnection result
+     * is reported asynchronously through the
+     * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
+     * callback.
+     */
+    public void disconnect() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
+        mBluetoothGatt.disconnect();
+    }
+
+    /**
+     * After using a given BLE device, the app must call this method to ensure resources are
+     * released properly.
+     */
+    public void close() {
+        if (mBluetoothGatt == null) {
+            return;
+        }
+        mBluetoothGatt.close();
+        mBluetoothGatt = null;
     }
 
     /**
