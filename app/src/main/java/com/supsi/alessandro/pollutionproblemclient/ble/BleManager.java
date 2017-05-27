@@ -30,7 +30,7 @@ import java.util.UUID;
  * Created by Alessandro on 20/05/2017.
  * <p>
  * Singleton class for:
- *
+ * <p>
  * BLE settings manipulation.
  * BLE devices discovery.
  * BLE devices connection/disconnection.
@@ -51,7 +51,6 @@ class BleManager {
     }
 
     /**
-     *
      * @return A singleton instance of this class
      */
     static BleManager getInstance() {
@@ -61,11 +60,11 @@ class BleManager {
     /**
      * Initializes the Bluetooth adapter.
      */
-    public void initialize(){
-        if(mBluetoothAdapter==null){
+    public void initialize() {
+        if (mBluetoothAdapter == null) {
             final BluetoothManager bluetoothManager = (BluetoothManager) PollutionApplication.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = bluetoothManager.getAdapter();
-        }else{
+        } else {
             Log.w(TAG, "initialize() ---> Bluetooth adapter is already initialized");
         }
     }
@@ -76,7 +75,7 @@ class BleManager {
      * @return true if bluetooth is enabled, false otherwise
      */
     boolean isBleEnabled() {
-        if(mBluetoothAdapter==null){
+        if (mBluetoothAdapter == null) {
             Log.w(TAG, "isBleEnabled() ---> bluetooth adapter NOT initialized");
             return false;
         }
@@ -90,7 +89,7 @@ class BleManager {
      * @param activity activity from where start the new activity
      */
     void askBleEnabling(Activity activity) {
-        if(mBluetoothAdapter==null){
+        if (mBluetoothAdapter == null) {
             Log.w(TAG, "askBleEnabling() ---> bluetooth adapter NOT initialized");
             return;
         }
@@ -105,13 +104,13 @@ class BleManager {
      * Starts a ble scanning with the new BluetoothLeScanner object available from API 21.
      * After a defined period stops automatically the scan, in order to save battery life.
      *
-     * @param scanFilters Filters to apply during the scan
+     * @param scanFilters  Filters to apply during the scan
      * @param scanSettings Scan settings
      * @param scanCallback Callback to call after the scan
      */
     void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
 
-        if(mBluetoothAdapter==null){
+        if (mBluetoothAdapter == null) {
             Log.w(TAG, "startBleScan() ---> bluetooth adapter NOT initialized");
             return;
         }
@@ -123,7 +122,7 @@ class BleManager {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG, "stop scan after "+BleConstants.SCAN_PERIOD+ " milliseconds");
+                Log.i(TAG, "stop scan after " + BleConstants.SCAN_PERIOD + " milliseconds");
                 mBluetoothLeScanner.stopScan(scanCallback);
             }
         }, BleConstants.SCAN_PERIOD);
@@ -135,7 +134,7 @@ class BleManager {
      * @param scanCallback Callback to call after stop the scan
      */
     void stopBleScan(ScanCallback scanCallback) {
-        if(mBluetoothAdapter==null){
+        if (mBluetoothAdapter == null) {
             Log.w(TAG, "stopBleScan() ---> bluetooth adapter NOT initialized");
             return;
         }
@@ -146,11 +145,11 @@ class BleManager {
     /**
      * Connects to a ble peripheral device.
      *
-     * @param device The peripheral device
+     * @param device                 The peripheral device
      * @param mBluetoothGattCallback The callback to call after connecting
      */
     void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
-        if(mBluetoothAdapter==null){
+        if (mBluetoothAdapter == null) {
             Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
             return;
         }
@@ -161,14 +160,14 @@ class BleManager {
     /**
      * Connects to a ble peripheral device.
      *
-     * @param deviceAddress The mac address of the ble peripheral device
+     * @param deviceAddress          The mac address of the ble peripheral device
      * @param mBluetoothGattCallback The callback to call after connecting
      * @return True if the device if found and it's possible to start a connection
-     *         False if the given address doesn't exist or in not reachable
+     * False if the given address doesn't exist or in not reachable
      */
     boolean connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
 
-        if(mBluetoothAdapter==null){
+        if (mBluetoothAdapter == null) {
             Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
             return false;
         }
@@ -189,7 +188,7 @@ class BleManager {
      * callback.
      */
     public void disconnect() {
-        if(mBluetoothAdapter==null || mBluetoothGatt==null){
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "isBleEnabled() ---> bluetooth adapter or bluetooth gatt NOT initialized");
             return;
         }
@@ -200,21 +199,28 @@ class BleManager {
      * After using a given BLE device, the app must call this method to ensure resources are
      * released properly.
      */
-    public void close() {
+    void close() {
+        if (mBluetoothAdapter == null) {
+            Log.w(TAG, "close() ---> bluetooth adapter NOT initialized");
+            return;
+        }
+
+        mBluetoothAdapter = null;
+
         if (mBluetoothGatt == null) {
             Log.w(TAG, "close() ---> bluetooth gatt NOT initialized");
             return;
         }
+
         mBluetoothGatt.close();
         mBluetoothGatt = null;
-        mBluetoothAdapter = null;
     }
 
     /**
      * Enables notifications for the given characteristic
      *
      * @param gatt the BluetoothGatt towards perform the request
-     * @param c the characteristic to enable the notification
+     * @param c    the characteristic to enable the notification
      */
     void enableNotification(BluetoothGatt gatt, BluetoothGattCharacteristic c) {
         //TODO use the bluetooth gatt of this class and not that one pass as parameter

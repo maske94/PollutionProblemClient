@@ -1,5 +1,6 @@
 package com.supsi.alessandro.pollutionproblemclient.ble;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanCallback;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.R;
 
 import java.util.ArrayList;
@@ -169,10 +171,6 @@ public class PollutionDevicesScanActivity extends ListActivity {
             }
         }
 
-        public BluetoothDevice getDevice(int position) {
-            return mLeDevices.get(position);
-        }
-
         public void clear() {
             mLeDevices.clear();
         }
@@ -183,7 +181,7 @@ public class PollutionDevicesScanActivity extends ListActivity {
         }
 
         @Override
-        public Object getItem(int i) {
+        public BluetoothDevice getItem(int i) {
             return mLeDevices.get(i);
         }
 
@@ -193,8 +191,8 @@ public class PollutionDevicesScanActivity extends ListActivity {
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            ViewHolder viewHolder;
+        public View getView(final int i, View view, ViewGroup viewGroup) {
+            final ViewHolder viewHolder;
 
             // General ListView optimization code.
             if (view == null) {
@@ -216,6 +214,20 @@ public class PollutionDevicesScanActivity extends ListActivity {
                 viewHolder.deviceName.setText(R.string.unknown_device);
 
             viewHolder.deviceAddress.setText(device.getAddress());
+
+            /**
+             * Click listener on single list item
+             */
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i(TAG, "onClick() ---> clicked on "+getItem(i).getName());
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(Constants.EXTRA_ACTIVITY_RESULT,getItem(i));
+                    setResult(Activity.RESULT_OK,returnIntent);
+                    finish();
+                }
+            });
 
             return view;
         }

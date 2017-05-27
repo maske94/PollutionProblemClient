@@ -36,6 +36,7 @@
         <activity android:name=".ble.PollutionDevicesScanActivity">
 
         </activity>
+        <service android:name=".ble.PollutionDeviceConnectService" />
 
     </application>
 

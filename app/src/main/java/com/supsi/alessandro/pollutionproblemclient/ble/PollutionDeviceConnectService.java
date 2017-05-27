@@ -1,19 +1,19 @@
 package com.supsi.alessandro.pollutionproblemclient.ble;
 
-import android.app.Activity;
+import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
-import android.os.ParcelUuid;
-import android.support.annotation.NonNull;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.util.ArrayList;
+import com.supsi.alessandro.pollutionproblemclient.Constants;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -23,91 +23,48 @@ import java.util.UUID;
  * Discovers and connects with pollution wearable devices only, by exploiting BleManager.java
  * Reads services and characteristics.
  */
-public class PollutionBleCentral {
+public class PollutionDeviceConnectService extends Service {
 
-    private static final String TAG = PollutionBleCentral.class.getSimpleName();
-
+    private static final String TAG = PollutionDeviceConnectService.class.getSimpleName();
     private static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_HEART_MONITOR_UUID;
     private static final String CHARACTERISTIC_TO_DISCOVER = BleConstants.HEART_RATE_MEASUREMENT_CHARACTERISTIC_UUID;
 
-    private static final PollutionBleCentral mInstance = new PollutionBleCentral();
     private BleManager mBleManager;
 
-    private PollutionBleCentral() {
+    /**
+     * Service related stuffs
+     */
+
+    public class LocalBinder extends Binder {
+        public PollutionDeviceConnectService getService() {
+            return PollutionDeviceConnectService.this;
+        }
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind()");
         mBleManager = BleManager.getInstance();
+        mBleManager.initialize();
+        return mBinder;
     }
 
-    public static PollutionBleCentral getInstance() {
-        return mInstance;
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind()");
+        // After using a given device, you should make sure that BluetoothGatt.close() is called
+        // such that resources are cleaned up properly.  In this particular example, close() is
+        // invoked when the UI is disconnected from the Service.
+        mBleManager.close();
+        return super.onUnbind(intent);
     }
 
-    /**
-     * Starts a ble discovery
-     */
-    public void discoverPollutionDevices(Activity activity) {
-        if (mBleManager.isBleEnabled()) {
-            Log.i(TAG, "discoverPollutionDevices() ---> Ble is enabled");
+    private final IBinder mBinder = new LocalBinder();
 
-            if (!mBleManager.askForCoarseLocationPermission(activity))
-                return;
 
-            List<ScanFilter> scanFilters = buildScanFilters();
-            ScanSettings settings = buildScanSettings();
-
-            mBleManager.startBleScan(scanFilters, settings, new BleScanCallBack());
-        } else {
-            Log.i(TAG, "discoverPollutionDevices() ---> Ble is NOT enabled");
-            mBleManager.askBleEnabling(activity);
-        }
-    }
-
-    /**
-     * @return
-     */
-    private ScanSettings buildScanSettings() {
-        return new ScanSettings.Builder()
-                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .build();
-    }
-
-    /**
-     * @return
-     */
-    @NonNull
-    private List<ScanFilter> buildScanFilters() {
-        List<ScanFilter> scanFilters = new ArrayList<>();
-        scanFilters.add(new ScanFilter.Builder()
-                .setServiceUuid(new ParcelUuid(UUID.fromString(SERVICE_TO_DISCOVER)))
-                .build());
-        return scanFilters;
-    }
-
-    /**
-     * Callback called when a ble device is discovered
-     */
-    private class BleScanCallBack extends ScanCallback {
-
-        private boolean enabled = true;
-
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            if (enabled) { // boolean used to immediately stop the scan result callback.
-                Log.i(TAG, "onScanResult() ---> " + result.getDevice().getName());
-                mBleManager.stopBleScan(this);
-                mBleManager.connectToDevice(result.getDevice(), new BleConnectionCallback());
-                enabled = false;
-            }
-        }
-
-        @Override
-        public void onBatchScanResults(List<ScanResult> results) {
-            Log.i(TAG, "onBatchScanResults()");
-        }
-
-        @Override
-        public void onScanFailed(int errorCode) {
-            Log.i(TAG, "onScanFailed()");
-        }
+    public void connectPollutionDevice(BluetoothDevice device){
+        mBleManager.connectToDevice(device,new BleConnectionCallback());
     }
 
     /**
@@ -202,6 +159,11 @@ public class PollutionBleCentral {
                 }
                 final int heartRate = characteristic.getIntValue(format, 1);
                 Log.d(TAG, "\t---> Received heart rate: " + heartRate);
+
+                Intent intent = new Intent();
+                intent.setAction(Constants.ACTION_POLLUTION_UPDATE);
+                intent.putExtra(Constants.EXTRA_NEW_POLLUTION_DATA,heartRate+"");
+                sendBroadcast(intent);
             }
         }
     }

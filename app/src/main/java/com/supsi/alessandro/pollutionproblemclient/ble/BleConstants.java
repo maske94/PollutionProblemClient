@@ -5,8 +5,11 @@ package com.supsi.alessandro.pollutionproblemclient.ble;
  */
 
 public class BleConstants {
-    public static final int REQUEST_ENABLE_BT = 1;
-    public static final int PERMISSIONS_REQUEST_COARSE_LOCATION = 2;
+
+    // Activity request codes
+    static final int REQUEST_ENABLE_BT = 1;
+    public static final int POLL_DEVICES_SCAN_ACTIVITY_RESULT = 2;
+    static final int PERMISSIONS_REQUEST_COARSE_LOCATION = 3;
 
     static final long SCAN_PERIOD = 10000L; // in milliseconds
 
