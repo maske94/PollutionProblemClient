@@ -20,8 +20,8 @@ import java.util.UUID;
 /**
  * Created by Alessandro on 21/05/2017.
  * <p>
- * Discovers and connects with pollution wearable devices only, by exploiting BleManager.java
- * Reads services and characteristics.
+ * Service that connects to a pollution wearable device only, by exploiting BleManager.java
+ * Reads defined services and characteristics of a pollution device.
  */
 public class PollutionDeviceConnectService extends Service {
 
@@ -32,7 +32,7 @@ public class PollutionDeviceConnectService extends Service {
     private BleManager mBleManager;
 
     /**
-     * Service related stuffs
+     * Service binding related stuffs
      */
 
     public class LocalBinder extends Binder {
@@ -61,7 +61,6 @@ public class PollutionDeviceConnectService extends Service {
     }
 
     private final IBinder mBinder = new LocalBinder();
-
 
     public void connectPollutionDevice(BluetoothDevice device){
         mBleManager.connectToDevice(device,new BleConnectionCallback());
