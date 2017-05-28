@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by Alessandro on 01/05/2017.
  */
-public class Child {
+public class Child{
 
     @SerializedName("username")
     private String parentUsername;
@@ -88,5 +88,21 @@ public class Child {
                 ", birthDate=" + birthDate +
                 ", deviceId='" + deviceId + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Child child = (Child) o;
+
+        return childId.equals(child.childId);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return childId.hashCode();
     }
 }

@@ -3,6 +3,7 @@ package com.supsi.alessandro.pollutionproblemclient.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 
 public class PollutionSharedPreferences {
 
+    private static final String TAG = PollutionSharedPreferences.class.getSimpleName();
     private static final PollutionSharedPreferences instance = new PollutionSharedPreferences();
     private static final String POLLUTION_SHARED_PREFERENCES_FILE_KEY = "com.supsi.alessandro.pollutionproblemclient.POLLUTION_APP_FILE_KEY";
     private SharedPreferences mSharedPreferences;
@@ -100,14 +102,11 @@ public class PollutionSharedPreferences {
              * Finally, stored the new array list.
              */
 
-            // workaround TypeToken<ArrayList<Child>>(){} --> creates an anonymous inner class that allows to call the getType() method,
-            // which otherwise has private access in the TypeToken class.
-            ArrayList<Child> childrenList = gson.fromJson(storedString, new TypeToken<ArrayList<Child>>() {
-            }.getType());
+            ArrayList<Child> childrenList = buildChildrenListFromJson(storedString);
             childrenList.add(child);
 
             // Restore the new children list with the new added child
-            String childrenJson = gson.toJson(storedString);
+            String childrenJson = gson.toJson(childrenList);
             editor.putString(CHILDREN_KEY, childrenJson);
         }
 
@@ -115,6 +114,57 @@ public class PollutionSharedPreferences {
     }
 
 
+    /**
+     * Remove all the shared preferences of the logged in user
+     */
+    public void removeUser() {
+        if (mSharedPreferences.contains(USERNAME_KEY)) {
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.remove(USERNAME_KEY)
+                    .remove(PASSWORD_KEY)
+                    .remove(CHILDREN_KEY);
+            editor.commit();
+        }
+    }
 
+    /**
+     * Remove a child from the children list stored in shared preferences.
+     *
+     * @param child The child to remove
+     */
+    public void removeChild(@NonNull final Child child) {
+        if (mSharedPreferences.contains(CHILDREN_KEY)) {
+            ArrayList<Child> childrenList = buildChildrenListFromJson(mSharedPreferences.getString(CHILDREN_KEY, CHILDREN_NOT_EXIST_KEY));
+            boolean removed = childrenList.remove(child);
+
+            if (removed) {
+                // Store the new children list without the removed child
+                String childrenJson = new Gson().toJson(childrenList);
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putString(CHILDREN_KEY, childrenJson);
+                editor.commit();
+                Log.d(TAG, "removeChild() --> child removed");
+            } else {
+                Log.e(TAG, "removeChild() --> child NOT removed because it does not exist in the children list");
+            }
+
+        } else {
+            Log.e(TAG, "removeChild() ---> " + CHILDREN_KEY + " key does not exist in shared preferences.");
+        }
+    }
+
+    /**
+     * Transforms a json formatted string into an array list of child
+     *
+     * @param storedString The Json formatted string to be transformed in a Children Array List
+     * @return The created children array list
+     */
+    private ArrayList<Child> buildChildrenListFromJson(String storedString) {
+        Gson gson = new Gson();
+        // workaround TypeToken<ArrayList<Child>>(){} --> creates an anonymous inner class that allows to call the getType() method,
+        // which otherwise has private access in the TypeToken class.
+        return gson.fromJson(storedString, new TypeToken<ArrayList<Child>>() {
+        }.getType());
+    }
 
 }
