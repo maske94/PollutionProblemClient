@@ -21,25 +21,30 @@ public class PollutionSharedPreferences {
     private static final String TAG = PollutionSharedPreferences.class.getSimpleName();
     private static final PollutionSharedPreferences instance = new PollutionSharedPreferences();
     private static final String POLLUTION_SHARED_PREFERENCES_FILE_KEY = "com.supsi.alessandro.pollutionproblemclient.POLLUTION_APP_FILE_KEY";
-    private SharedPreferences mSharedPreferences;
 
     // Pollution shared preferences keys
     private static final String USERNAME_KEY = "username";
     private static final String PASSWORD_KEY = "password";
     private static final String CHILDREN_KEY = "children";
-    private static final String CHILDREN_NOT_EXIST_KEY = "childrenNotExists";
+    private static final String CHILDREN_NOT_STORED_KEY = "childrenNotStored";
+    private static final String USERNAME_NOT_STORED_KEY = "usernameNotStored";
+    private static final String PASSWORD_NOT_STORED_KEY = "passwordNotStored";
+
+    private SharedPreferences mSharedPreferences=null;
+
 
     /**
      * Private constructor in order to implement singleton pattern
      */
     private PollutionSharedPreferences() {
-
+        Context context = PollutionApplication.getAppContext();
+        mSharedPreferences = context.getSharedPreferences(POLLUTION_SHARED_PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
     }
 
     /**
      * @return A singleton instance of this class
      */
-    static PollutionSharedPreferences getInstance() {
+    public static PollutionSharedPreferences getInstance() {
         return instance;
     }
 
@@ -47,8 +52,7 @@ public class PollutionSharedPreferences {
      * Instantiates a shared preference instance
      */
     public void init() {
-        Context context = PollutionApplication.getAppContext();
-        mSharedPreferences = context.getSharedPreferences(POLLUTION_SHARED_PREFERENCES_FILE_KEY, Context.MODE_PRIVATE);
+
     }
 
     /**
@@ -76,15 +80,15 @@ public class PollutionSharedPreferences {
         Gson gson = new Gson();
         SharedPreferences.Editor editor = mSharedPreferences.edit();
 
-        // Returns CHILDREN_NOT_EXIST_KEY if CHILDREN_KEY does not exist
-        String storedString = mSharedPreferences.getString(CHILDREN_KEY, CHILDREN_NOT_EXIST_KEY);
+        // Returns CHILDREN_NOT_STORED_KEY if CHILDREN_KEY does not exist
+        String storedString = mSharedPreferences.getString(CHILDREN_KEY, CHILDREN_NOT_STORED_KEY);
 
         /**
          *  Check whether the list of children already exist or not
          */
 
         // If does not exist
-        if (storedString.equals(CHILDREN_NOT_EXIST_KEY)) {
+        if (storedString.equals(CHILDREN_NOT_STORED_KEY)) {
 
             ArrayList<Child> childrenList = new ArrayList<>();
             childrenList.add(child);
@@ -93,7 +97,7 @@ public class PollutionSharedPreferences {
             editor.putString(CHILDREN_KEY, childrenListAsJson);
         }
 
-        // If it already exist
+        // If it already exists
         else {
 
             /**
@@ -118,6 +122,7 @@ public class PollutionSharedPreferences {
      * Remove all the shared preferences of the logged in user
      */
     public void removeUser() {
+
         if (mSharedPreferences.contains(USERNAME_KEY)) {
             SharedPreferences.Editor editor = mSharedPreferences.edit();
             editor.remove(USERNAME_KEY)
@@ -133,8 +138,9 @@ public class PollutionSharedPreferences {
      * @param child The child to remove
      */
     public void removeChild(@NonNull final Child child) {
+
         if (mSharedPreferences.contains(CHILDREN_KEY)) {
-            ArrayList<Child> childrenList = buildChildrenListFromJson(mSharedPreferences.getString(CHILDREN_KEY, CHILDREN_NOT_EXIST_KEY));
+            ArrayList<Child> childrenList = buildChildrenListFromJson(mSharedPreferences.getString(CHILDREN_KEY, CHILDREN_NOT_STORED_KEY));
             boolean removed = childrenList.remove(child);
 
             if (removed) {
@@ -151,6 +157,39 @@ public class PollutionSharedPreferences {
         } else {
             Log.e(TAG, "removeChild() ---> " + CHILDREN_KEY + " key does not exist in shared preferences.");
         }
+    }
+
+    /**
+     * Returns the stored username if it exists
+     *
+     * @return The stored username if it exits, if not returns a not stored username key string
+     */
+    public String getStoredUsername(){
+        return mSharedPreferences.getString(USERNAME_KEY, USERNAME_NOT_STORED_KEY);
+    }
+
+    /**
+     * Returns the stored password if it exists
+     *
+     * @return The stored password if it exits, if not returns a not stored password key string
+     */
+    public String getStoredPassword(){
+        return mSharedPreferences.getString(PASSWORD_KEY, PASSWORD_NOT_STORED_KEY);
+    }
+
+    /**
+     * Build the children list from the stored json shared preferences and then returns it.
+     *
+     * @return An array list of children if a children list has been previously stored, otherwise null.
+     */
+    public ArrayList<Child> getStoredChildrenList(){
+        String jsonChildrenList = mSharedPreferences.getString(CHILDREN_KEY,CHILDREN_NOT_STORED_KEY);
+
+        if(jsonChildrenList.equals(CHILDREN_NOT_STORED_KEY)){
+            return null;
+        }
+
+        return buildChildrenListFromJson(jsonChildrenList);
     }
 
     /**
