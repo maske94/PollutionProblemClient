@@ -27,8 +27,6 @@ public class PollutionSharedPreferences {
     private static final String PASSWORD_KEY = "password";
     private static final String CHILDREN_KEY = "children";
     private static final String CHILDREN_NOT_STORED_KEY = "childrenNotStored";
-    private static final String USERNAME_NOT_STORED_KEY = "usernameNotStored";
-    private static final String PASSWORD_NOT_STORED_KEY = "passwordNotStored";
 
     private SharedPreferences mSharedPreferences=null;
 
@@ -49,13 +47,6 @@ public class PollutionSharedPreferences {
     }
 
     /**
-     * Instantiates a shared preference instance
-     */
-    public void init() {
-
-    }
-
-    /**
      * Stores username and password in the shared preferences
      *
      * @param username Logged in user's username
@@ -69,13 +60,22 @@ public class PollutionSharedPreferences {
     }
 
     /**
-     * Checks if there's already stored a list of children in the shared preferences.
+     * First of all checks if there is a username already stored, because it does not make sense
+     * to add a child if no user is stored.
+     *
+     * Then checks if there's already stored a list of children in the shared preferences.
      * If so, adds the given child to the list.
      * If not, creates a new list and store the first given child.
      *
      * @param child The child be stored
+     * @return True is the given child is store, false otherwise
      */
-    public void storeChild(@NonNull final Child child) {
+    public boolean storeChild(@NonNull final Child child) {
+
+        if(!mSharedPreferences.contains(USERNAME_KEY)){
+            Log.e(TAG, "storeChild: impossible to add a new child because no username is stored");
+            return false;
+        }
 
         Gson gson = new Gson();
         SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -115,13 +115,15 @@ public class PollutionSharedPreferences {
         }
 
         editor.commit();
+
+        return true;
     }
 
 
     /**
      * Remove all the shared preferences of the logged in user
      */
-    public void removeUser() {
+    public void cleanAll() {
 
         if (mSharedPreferences.contains(USERNAME_KEY)) {
             SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -129,6 +131,9 @@ public class PollutionSharedPreferences {
                     .remove(PASSWORD_KEY)
                     .remove(CHILDREN_KEY);
             editor.commit();
+            Log.d(TAG, "cleanAll: removed all");
+        }else{
+            Log.d(TAG, "cleanAll: nothing to remove");
         }
     }
 
@@ -136,8 +141,9 @@ public class PollutionSharedPreferences {
      * Remove a child from the children list stored in shared preferences.
      *
      * @param child The child to remove
+     * @return The new children list if the child has been removed, false otherwise
      */
-    public void removeChild(@NonNull final Child child) {
+    public ArrayList<Child> removeChild(@NonNull final Child child) {
 
         if (mSharedPreferences.contains(CHILDREN_KEY)) {
             ArrayList<Child> childrenList = buildChildrenListFromJson(mSharedPreferences.getString(CHILDREN_KEY, CHILDREN_NOT_STORED_KEY));
@@ -150,31 +156,35 @@ public class PollutionSharedPreferences {
                 editor.putString(CHILDREN_KEY, childrenJson);
                 editor.commit();
                 Log.d(TAG, "removeChild() --> child removed");
+                return childrenList;
             } else {
                 Log.e(TAG, "removeChild() --> child NOT removed because it does not exist in the children list");
+                return null;
             }
+
 
         } else {
             Log.e(TAG, "removeChild() ---> " + CHILDREN_KEY + " key does not exist in shared preferences.");
+            return null;
         }
     }
 
     /**
      * Returns the stored username if it exists
      *
-     * @return The stored username if it exits, if not returns a not stored username key string
+     * @return The stored username if it exits, otherwise null
      */
     public String getStoredUsername(){
-        return mSharedPreferences.getString(USERNAME_KEY, USERNAME_NOT_STORED_KEY);
+        return mSharedPreferences.getString(USERNAME_KEY, null);
     }
 
     /**
      * Returns the stored password if it exists
      *
-     * @return The stored password if it exits, if not returns a not stored password key string
+     * @return The stored password if it exits, otherwise null
      */
     public String getStoredPassword(){
-        return mSharedPreferences.getString(PASSWORD_KEY, PASSWORD_NOT_STORED_KEY);
+        return mSharedPreferences.getString(PASSWORD_KEY, null);
     }
 
     /**
