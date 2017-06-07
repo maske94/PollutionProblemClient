@@ -9,12 +9,15 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by Alessandro on 05/06/2017.
  */
 
 public class PollutionProvider extends ContentProvider {
+
+    private static final String TAG = PollutionProvider.class.getSimpleName();
 
     /**
      * Reference to the pollution db helper,
@@ -115,10 +118,36 @@ public class PollutionProvider extends ContentProvider {
         }
     }
 
+    /**
+     * Insert a new entry into the database.
+     */
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+        final SQLiteDatabase db = mPollutionDatabase.getWritableDatabase();
+        assert db != null;
+
+        final int match = mUriMatcher.match(uri);
+        Uri result;
+        switch (match) {
+            case ROUTE_EVENTS:
+                long id = db.insertOrThrow(PollutionContract.Event.TABLE_NAME, null, contentValues);
+                if(id==-1) {
+                    Log.e(TAG, "insert: ERROR WHEN INSERTING IN DB");
+                }
+                result = Uri.parse(PollutionContract.Event.CONTENT_URI + "/" + id);
+                break;
+            case ROUTE_EVENTS_ID:
+                throw new UnsupportedOperationException("Insert not supported on URI: " + uri);
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        // Send broadcast to registered ContentObservers, to refresh UI.
+        Context ctx = getContext();
+        assert ctx != null;
+        ctx.getContentResolver().notifyChange(uri, null, false);
+        return result;
     }
 
     @Override
