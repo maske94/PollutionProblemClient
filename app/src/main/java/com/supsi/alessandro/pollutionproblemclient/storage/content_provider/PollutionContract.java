@@ -23,7 +23,7 @@ public class PollutionContract  {
     /**
      * Content provider authority.
      */
-    public static final String CONTENT_AUTHORITY = "com.supsi.alessandro.pollutionproblemclient";
+    public static final String CONTENT_AUTHORITY = "com.supsi.alessandro.pollutionproblemclient.provider"; // best practice: App package + ".provider"
 
     /**
      * Base URI.
@@ -35,6 +35,10 @@ public class PollutionContract  {
      */
     public static final String PATH_EVENTS = "events";
 
+    /**
+     * Path that identify a row in the pollution events' table
+     */
+    public static final String PATH_EVENTS_ID = "events/*";
 
     /**
      * Class that contains all that regards the table "events"
