@@ -132,7 +132,7 @@ public class PollutionProvider extends ContentProvider {
         switch (match) {
             case ROUTE_EVENTS:
                 long id = db.insertOrThrow(PollutionContract.Event.TABLE_NAME, null, contentValues);
-                if(id==-1) {
+                if (id == -1) {
                     Log.e(TAG, "insert: ERROR WHEN INSERTING IN DB");
                 }
                 result = Uri.parse(PollutionContract.Event.CONTENT_URI + "/" + id);
@@ -150,9 +150,43 @@ public class PollutionProvider extends ContentProvider {
         return result;
     }
 
+    /**
+     * Delete rows from the db.
+     *
+     * @return The number of deleted rows
+     */
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        SelectionBuilder builder = new SelectionBuilder();
+        final SQLiteDatabase db = mPollutionDatabase.getWritableDatabase();
+        assert db != null;
+
+        final int match = mUriMatcher.match(uri);
+        int count;
+
+        switch (match) {
+            case ROUTE_EVENTS:
+                count = builder.table(PollutionContract.Event.TABLE_NAME)
+                        .where(selection, selectionArgs)
+                        .delete(db);
+                break;
+            case ROUTE_EVENTS_ID:
+                String id = uri.getLastPathSegment();
+                count = builder.table(PollutionContract.Event.TABLE_NAME)
+                        .where(PollutionContract.Event._ID + "=?", id)
+                        .where(selection, selectionArgs)
+                        .delete(db);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        // Send broadcast to registered ContentObservers, to refresh UI.
+        Context ctx = getContext();
+        assert ctx != null;
+        ctx.getContentResolver().notifyChange(uri, null, false);
+
+        return count;
     }
 
     @Override

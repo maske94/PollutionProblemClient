@@ -34,7 +34,7 @@ import java.util.UUID;
 public class PollutionDevicesScanActivity extends ListActivity {
 
     private static final String TAG = PollutionDevicesScanActivity.class.getSimpleName();
-    private static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_HEART_MONITOR_UUID;
+    private static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_H10_RADIO_UUID;
 
     private BleManager mBleManager;
     private PollutionDeviceListAdapter mPollutionDeviceListAdapter;
