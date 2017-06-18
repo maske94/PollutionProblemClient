@@ -27,6 +27,7 @@ class PollutionDatabase extends SQLiteOpenHelper {
      */
     private static final String TYPE_STRING = " VARCHAR(255)";
     private static final String TYPE_FLOAT = " REAL";
+    private static final String TYPE_INTEGER = " INTEGER";
     private static final String COMMA_SEPARATOR = ",";
 
     /**
@@ -34,7 +35,8 @@ class PollutionDatabase extends SQLiteOpenHelper {
      */
     private static final String TABLE_EVENTS_CREATE_QUERY =
             "CREATE TABLE " + PollutionContract.Event.TABLE_NAME + " (" +
-                    PollutionContract.Event.COLUMN_NAME_TIMESTAMP + TYPE_STRING + " PRIMARY KEY" + COMMA_SEPARATOR +
+                    PollutionContract.Event._ID + TYPE_INTEGER + " PRIMARY KEY AUTOINCREMENT" + COMMA_SEPARATOR +
+                    PollutionContract.Event.COLUMN_NAME_TIMESTAMP + TYPE_STRING + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_USERNAME + TYPE_STRING + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_GPS_LAT + TYPE_FLOAT + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_GPS_LONG + TYPE_FLOAT + COMMA_SEPARATOR +

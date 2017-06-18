@@ -232,4 +232,29 @@ public class PollutionProvider extends ContentProvider {
 
         return results;
     }
+
+    /**
+     * Deletes multiple events by exploiting the batch mechanism.
+     *
+     * @param eventsIds The list of events to be dropped
+     * @param contentResolver An instance of content resolver
+     */
+    public static ContentProviderResult[] deleteEvents(ArrayList<Integer> eventsIds, ContentResolver contentResolver) throws RemoteException, OperationApplicationException {
+
+        ArrayList<ContentProviderOperation> batch = new ArrayList<>();
+        Uri eventToDropUri;
+
+        for (Integer i : eventsIds) {
+            eventToDropUri = PollutionContract.Event.CONTENT_URI.buildUpon().appendPath(Integer.toString(i)).build();
+            batch.add(ContentProviderOperation.newDelete(eventToDropUri)
+                    .build());
+        }
+
+        ContentProviderResult[] results = contentResolver.applyBatch(PollutionContract.CONTENT_AUTHORITY, batch);
+
+        Log.d(TAG, "deleteEvents() ---> results after batch operation: "+ Arrays.toString(results));
+
+        return results;
+    }
+
 }
