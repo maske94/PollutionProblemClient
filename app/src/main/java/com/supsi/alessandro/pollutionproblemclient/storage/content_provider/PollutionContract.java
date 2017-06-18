@@ -71,6 +71,11 @@ public class PollutionContract  {
         /**
          * Column timestamp: Timestamp when the event has been detected.
          */
+        public static final String COLUMN_NAME_USERNAME = "username";
+
+        /**
+         * Column timestamp: Timestamp when the event has been detected.
+         */
         public static final String COLUMN_NAME_TIMESTAMP = "timestamp";
 
         /**

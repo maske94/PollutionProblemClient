@@ -1,15 +1,25 @@
 package com.supsi.alessandro.pollutionproblemclient.storage.content_provider;
 
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Alessandro on 05/06/2017.
@@ -194,5 +204,32 @@ public class PollutionProvider extends ContentProvider {
         return 0;
     }
 
+    /**
+     * Stores multiple events by exploiting the batch mechanism.
+     *
+     * @param events The list of events to be stored
+     * @param contentResolver An instance of content resolver
+     */
+    public static ContentProviderResult[] storeEvents(ArrayList<Event> events, ContentResolver contentResolver) throws RemoteException, OperationApplicationException {
 
+        ArrayList<ContentProviderOperation> batch = new ArrayList<>();
+
+        for (Event e : events) {
+            batch.add(ContentProviderOperation.newInsert(PollutionContract.Event.CONTENT_URI)
+                    .withValue(PollutionContract.Event.COLUMN_NAME_USERNAME, e.getUsername())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_CHILD_ID, e.getChildId())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LAT, e.getUsername())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LONG, e.getUsername())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_POLL_VALUE, e.getUsername())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_TIMESTAMP, e.getUsername())
+                    .build());
+
+        }
+
+        ContentProviderResult[] results = contentResolver.applyBatch(PollutionContract.CONTENT_AUTHORITY, batch);
+
+        Log.d(TAG, "storeEvents() ---> results after batch operation: "+ Arrays.toString(results));
+
+        return results;
+    }
 }

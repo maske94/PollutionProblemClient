@@ -35,6 +35,7 @@ class PollutionDatabase extends SQLiteOpenHelper {
     private static final String TABLE_EVENTS_CREATE_QUERY =
             "CREATE TABLE " + PollutionContract.Event.TABLE_NAME + " (" +
                     PollutionContract.Event.COLUMN_NAME_TIMESTAMP + TYPE_STRING + " PRIMARY KEY" + COMMA_SEPARATOR +
+                    PollutionContract.Event.COLUMN_NAME_USERNAME + TYPE_STRING + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_GPS_LAT + TYPE_FLOAT + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_GPS_LONG + TYPE_FLOAT + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_POLL_VALUE + TYPE_FLOAT + COMMA_SEPARATOR +
