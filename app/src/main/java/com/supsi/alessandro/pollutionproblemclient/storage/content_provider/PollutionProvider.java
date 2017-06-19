@@ -296,19 +296,19 @@ public class PollutionProvider extends ContentProvider {
             selectionArgs[0] = username;
             selectionArgs[1] = childId;
         } else if (dateEnd == null) {// It means that we have only the lower bound: dateStart
-            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">?";
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">=?";
             selectionArgs = new String[3];
             selectionArgs[0] = username;
             selectionArgs[1] = childId;
             selectionArgs[2] = dateStart;
         } else if (dateStart == null) {// It means that we have only the upper bound: dateEnd
-            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<=?";
             selectionArgs = new String[3];
             selectionArgs[0] = username;
             selectionArgs[1] = childId;
             selectionArgs[2] = dateEnd;
         } else {// We have both bounds: dateStart and dateEnd
-            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<=?";
             selectionArgs = new String[4];
             selectionArgs[0] = username;
             selectionArgs[1] = childId;
