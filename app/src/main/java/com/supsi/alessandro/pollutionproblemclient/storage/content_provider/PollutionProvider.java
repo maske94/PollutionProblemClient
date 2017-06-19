@@ -33,7 +33,7 @@ public class PollutionProvider extends ContentProvider {
      * Reference to the pollution db helper,
      * necessary to get readable and writable database on which perform queries
      */
-    PollutionDatabase mPollutionDatabase;
+    private PollutionDatabase mPollutionDatabase;
 
     /**
      * Content authority for this provider.
@@ -60,6 +60,12 @@ public class PollutionProvider extends ContentProvider {
     public static final int ROUTE_EVENTS_ID = 2;
 
     /**
+     * Default values for the events
+     */
+    static final int EVENT_SYNCED = 1;
+    static final int EVENT_NOT_SYNCED = 0;
+
+    /**
      * UriMatcher, used to decode incoming URIs.
      */
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -68,6 +74,7 @@ public class PollutionProvider extends ContentProvider {
         mUriMatcher.addURI(AUTHORITY, PollutionContract.PATH_EVENTS, ROUTE_EVENTS);
         mUriMatcher.addURI(AUTHORITY, PollutionContract.PATH_EVENTS_ID, ROUTE_EVENTS_ID);
     }
+
 
     @Override
     public boolean onCreate() {
@@ -207,7 +214,7 @@ public class PollutionProvider extends ContentProvider {
     /**
      * Stores multiple events by exploiting the batch mechanism.
      *
-     * @param events The list of events to be stored
+     * @param events          The list of events to be stored
      * @param contentResolver An instance of content resolver
      */
     public static ContentProviderResult[] storeEvents(ArrayList<Event> events, ContentResolver contentResolver) throws RemoteException, OperationApplicationException {
@@ -222,13 +229,14 @@ public class PollutionProvider extends ContentProvider {
                     .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LONG, e.getUsername())
                     .withValue(PollutionContract.Event.COLUMN_NAME_POLL_VALUE, e.getUsername())
                     .withValue(PollutionContract.Event.COLUMN_NAME_TIMESTAMP, e.getUsername())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_SYNCED, EVENT_NOT_SYNCED)
                     .build());
 
         }
 
         ContentProviderResult[] results = contentResolver.applyBatch(PollutionContract.CONTENT_AUTHORITY, batch);
 
-        Log.d(TAG, "storeEvents() ---> results after batch operation: "+ Arrays.toString(results));
+        Log.d(TAG, "storeEvents() ---> results after batch operation: " + Arrays.toString(results));
 
         return results;
     }
@@ -236,7 +244,7 @@ public class PollutionProvider extends ContentProvider {
     /**
      * Deletes multiple events by exploiting the batch mechanism.
      *
-     * @param eventsIds The list of events to be dropped
+     * @param eventsIds       The list of events to be dropped
      * @param contentResolver An instance of content resolver
      */
     public static ContentProviderResult[] deleteEvents(ArrayList<Integer> eventsIds, ContentResolver contentResolver) throws RemoteException, OperationApplicationException {
@@ -252,9 +260,87 @@ public class PollutionProvider extends ContentProvider {
 
         ContentProviderResult[] results = contentResolver.applyBatch(PollutionContract.CONTENT_AUTHORITY, batch);
 
-        Log.d(TAG, "deleteEvents() ---> results after batch operation: "+ Arrays.toString(results));
+        Log.d(TAG, "deleteEvents() ---> results after batch operation: " + Arrays.toString(results));
 
         return results;
+    }
+
+    /**
+     * Utility method to select events from the database by exploiting the content provider.
+     * Prepares select statement by using the given attributes.
+     * Executes the query method though the given contentResolver.
+     *
+     * @param username Username to which filter the events
+     * @param childId child id to which filter the events
+     * @param dateStart timestamp to which start filtering the events, can be null
+     * @param dateEnd timestamp to which end filtering the events, can be null
+     * @param contentResolver contentResolver used to interact with the content provider
+     *
+     * @return An array list of events that satisfy the given filters
+     */
+    public static ArrayList<Event> getEvents(String username, String childId, String dateStart, String dateEnd, ContentResolver contentResolver) {
+
+        assert username != null;
+        assert childId != null;
+        assert contentResolver != null;
+
+        /**
+         * Build selection string and selectionArgs string depending on the given date bounds (dateStart and dateEnd).
+         */
+        String selection;
+        String[] selectionArgs = {username, childId};
+
+        if (dateStart == null && dateEnd == null) {// In this case we don't use any timestamp bound
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=?";
+        } else if (dateEnd == null) {// It means that we have only the lower bound: dateStart
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND" + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">?";
+            selectionArgs[2] = dateStart;
+        } else if (dateStart == null) {// It means that we have only the upper bound: dateEnd
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND" + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selectionArgs[2] = dateEnd;
+        } else {// We have both bounds: dateStart and dateEnd
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND" + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selectionArgs[2] = dateStart;
+            selectionArgs[3] = dateEnd;
+        }
+
+        Cursor c = contentResolver.query(PollutionContract.Event.CONTENT_URI, PollutionContract.Event.COLUMNS_PROJECTION, selection, selectionArgs, null);
+        assert c != null;
+
+        ArrayList<Event> events = buildEventsFromCursor(c);
+        c.close();
+        Log.d(TAG, "getEvents() ---> selected events: "+events);
+        return events;
+    }
+
+    /**
+     * Transforms the result coming from a {@link Cursor} into an {@link ArrayList} of events.
+     *
+     * @param c The cursor to be transformed into array list.
+     * @return The {@link ArrayList} of events
+     */
+    private static ArrayList<Event> buildEventsFromCursor(Cursor c) {
+        ArrayList<Event> events = new ArrayList<>();
+
+        if (c.moveToFirst()) {
+            do {
+                int id = c.getInt(c.getColumnIndex(PollutionContract.Event._ID));
+                String username = c.getString(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_USERNAME));
+                String childId = c.getString(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_CHILD_ID));
+                String timestamp = c.getString(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_TIMESTAMP));
+                float pollValue = c.getFloat(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_POLL_VALUE));
+                float gpsLat = c.getFloat(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_GPS_LAT));
+                float gpsLong = c.getFloat(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_GPS_LONG));
+                int synced = c.getInt(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_SYNCED));
+
+                Event e = new Event(username,childId,pollValue,timestamp,gpsLat,gpsLong);
+                e.setEventId(id);
+                e.setSynced(synced);
+                events.add(e);
+            } while (c.moveToNext());
+        }
+
+        return events;
     }
 
 }

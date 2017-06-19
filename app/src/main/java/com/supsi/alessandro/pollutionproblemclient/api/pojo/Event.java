@@ -28,6 +28,8 @@ public class Event{
     @SerializedName("gpsLong")
     private String gpsLong;
 
+    private int synced;
+
     public Event(String username, String childId, String pollutionValue, String timeStamp, String gpsLat, String gpsLong) {
         this.username = username;
         this.childId = childId;
@@ -37,12 +39,20 @@ public class Event{
         this.gpsLong = gpsLong;
     }
 
+    public Event(String username, String childId, float pollValue, String timestamp, float gpsLat, float gpsLong) {
+        this(username,childId,pollValue+"",timestamp,gpsLat+"",gpsLong+"");
+    }
+
     public String getEventId() {
         return eventId;
     }
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId+"";
     }
 
     public String getUsername() {
@@ -103,6 +113,11 @@ public class Event{
                 ", timeStamp='" + timeStamp + '\'' +
                 ", gpsLat='" + gpsLat + '\'' +
                 ", gpsLong='" + gpsLong + '\'' +
+                ", synced=" + synced +
                 '}';
+    }
+
+    public void setSynced(int synced) {
+        this.synced = synced;
     }
 }

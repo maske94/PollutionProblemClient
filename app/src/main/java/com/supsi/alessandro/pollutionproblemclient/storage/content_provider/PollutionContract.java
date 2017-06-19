@@ -98,6 +98,23 @@ public class PollutionContract  {
          */
         public static final String COLUMN_NAME_GPS_LONG = "gps_long";
 
+        /**
+         * Column synced: Specifies whether the corresponding event has been synchronized with the server or not
+         * Is an integer type : 0 --> not synced    1 --> synced
+         */
+        public static final String COLUMN_NAME_SYNCED = "synced";
+
+
+        static final String[] COLUMNS_PROJECTION = new String[]{
+                _ID,
+                COLUMN_NAME_USERNAME,
+                COLUMN_NAME_CHILD_ID,
+                COLUMN_NAME_TIMESTAMP,
+                COLUMN_NAME_POLL_VALUE,
+                COLUMN_NAME_GPS_LAT,
+                COLUMN_NAME_GPS_LONG,
+                COLUMN_NAME_SYNCED
+        };
     }
 
 }
