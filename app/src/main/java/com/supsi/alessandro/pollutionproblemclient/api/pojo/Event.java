@@ -103,6 +103,10 @@ public class Event{
         this.gpsLong = gpsLong;
     }
 
+    public void setSynced(int synced) {
+        this.synced = synced;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
@@ -117,7 +121,33 @@ public class Event{
                 '}';
     }
 
-    public void setSynced(int synced) {
-        this.synced = synced;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Event event = (Event) o;
+
+        if (username != null ? !username.equals(event.username) : event.username != null)
+            return false;
+        if (childId != null ? !childId.equals(event.childId) : event.childId != null) return false;
+        if (pollutionValue != null ? !pollutionValue.equals(event.pollutionValue) : event.pollutionValue != null)
+            return false;
+        if (timeStamp != null ? !timeStamp.equals(event.timeStamp) : event.timeStamp != null)
+            return false;
+        if (gpsLat != null ? !gpsLat.equals(event.gpsLat) : event.gpsLat != null) return false;
+        return gpsLong != null ? gpsLong.equals(event.gpsLong) : event.gpsLong == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = username != null ? username.hashCode() : 0;
+        result = 31 * result + (childId != null ? childId.hashCode() : 0);
+        result = 31 * result + (pollutionValue != null ? pollutionValue.hashCode() : 0);
+        result = 31 * result + (timeStamp != null ? timeStamp.hashCode() : 0);
+        result = 31 * result + (gpsLat != null ? gpsLat.hashCode() : 0);
+        result = 31 * result + (gpsLong != null ? gpsLong.hashCode() : 0);
+        return result;
     }
 }

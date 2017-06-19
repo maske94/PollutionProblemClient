@@ -225,10 +225,10 @@ public class PollutionProvider extends ContentProvider {
             batch.add(ContentProviderOperation.newInsert(PollutionContract.Event.CONTENT_URI)
                     .withValue(PollutionContract.Event.COLUMN_NAME_USERNAME, e.getUsername())
                     .withValue(PollutionContract.Event.COLUMN_NAME_CHILD_ID, e.getChildId())
-                    .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LAT, e.getUsername())
-                    .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LONG, e.getUsername())
-                    .withValue(PollutionContract.Event.COLUMN_NAME_POLL_VALUE, e.getUsername())
-                    .withValue(PollutionContract.Event.COLUMN_NAME_TIMESTAMP, e.getUsername())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LAT, e.getGpsLat())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_GPS_LONG, e.getGpsLong())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_POLL_VALUE, e.getPollutionValue())
+                    .withValue(PollutionContract.Event.COLUMN_NAME_TIMESTAMP, e.getTimeStamp())
                     .withValue(PollutionContract.Event.COLUMN_NAME_SYNCED, EVENT_NOT_SYNCED)
                     .build());
 
@@ -285,21 +285,33 @@ public class PollutionProvider extends ContentProvider {
         assert contentResolver != null;
 
         /**
-         * Build selection string and selectionArgs string depending on the given date bounds (dateStart and dateEnd).
+         * Build selection string and selectionArgs string depending on the given date bounds ( dateStart and dateEnd ).
          */
         String selection;
-        String[] selectionArgs = {username, childId};
+        String[] selectionArgs;
 
         if (dateStart == null && dateEnd == null) {// In this case we don't use any timestamp bound
             selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=?";
+            selectionArgs = new String[2];
+            selectionArgs[0] = username;
+            selectionArgs[1] = childId;
         } else if (dateEnd == null) {// It means that we have only the lower bound: dateStart
-            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND" + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">?";
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">?";
+            selectionArgs = new String[3];
+            selectionArgs[0] = username;
+            selectionArgs[1] = childId;
             selectionArgs[2] = dateStart;
         } else if (dateStart == null) {// It means that we have only the upper bound: dateEnd
-            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND" + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selectionArgs = new String[3];
+            selectionArgs[0] = username;
+            selectionArgs[1] = childId;
             selectionArgs[2] = dateEnd;
         } else {// We have both bounds: dateStart and dateEnd
-            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND" + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selection = PollutionContract.Event.COLUMN_NAME_USERNAME + "=? AND " + PollutionContract.Event.COLUMN_NAME_CHILD_ID + "=? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + ">? AND " + PollutionContract.Event.COLUMN_NAME_TIMESTAMP + "<?";
+            selectionArgs = new String[4];
+            selectionArgs[0] = username;
+            selectionArgs[1] = childId;
             selectionArgs[2] = dateStart;
             selectionArgs[3] = dateEnd;
         }
@@ -316,7 +328,7 @@ public class PollutionProvider extends ContentProvider {
     /**
      * Transforms the result coming from a {@link Cursor} into an {@link ArrayList} of events.
      *
-     * @param c The cursor to be transformed into array list.
+     * @param c The {@link Cursor} to be transformed into an {@link ArrayList} of events.
      * @return The {@link ArrayList} of events
      */
     private static ArrayList<Event> buildEventsFromCursor(Cursor c) {
@@ -333,9 +345,11 @@ public class PollutionProvider extends ContentProvider {
                 float gpsLong = c.getFloat(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_GPS_LONG));
                 int synced = c.getInt(c.getColumnIndex(PollutionContract.Event.COLUMN_NAME_SYNCED));
 
+                // Creates the new event
                 Event e = new Event(username,childId,pollValue,timestamp,gpsLat,gpsLong);
                 e.setEventId(id);
                 e.setSynced(synced);
+
                 events.add(e);
             } while (c.moveToNext());
         }
@@ -343,4 +357,13 @@ public class PollutionProvider extends ContentProvider {
         return events;
     }
 
+    /**
+     * Remove all the data from the database.
+     *
+     * @param contentResolver contentResolver used to interact with the content provider
+     * @return The number of deleted rows
+     */
+    public static int cleanAll(ContentResolver contentResolver) {
+        return contentResolver.delete(PollutionContract.Event.CONTENT_URI,null,null);
+    }
 }

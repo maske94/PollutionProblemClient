@@ -25,6 +25,7 @@ class PollutionDatabase extends SQLiteOpenHelper {
     /**
      * Types declaration
      */
+    //TODO define all the types for each column  es: COLUMN_TYPE_TIMESTAMP
     private static final String TYPE_STRING = " TEXT";
     private static final String TYPE_FLOAT = " REAL";
     private static final String TYPE_INTEGER = " INTEGER";
@@ -38,9 +39,9 @@ class PollutionDatabase extends SQLiteOpenHelper {
                     PollutionContract.Event._ID + TYPE_INTEGER + " PRIMARY KEY AUTOINCREMENT" + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_TIMESTAMP + TYPE_STRING + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_USERNAME + TYPE_STRING + COMMA_SEPARATOR +
-                    PollutionContract.Event.COLUMN_NAME_GPS_LAT + TYPE_FLOAT + COMMA_SEPARATOR +
-                    PollutionContract.Event.COLUMN_NAME_GPS_LONG + TYPE_FLOAT + COMMA_SEPARATOR +
-                    PollutionContract.Event.COLUMN_NAME_POLL_VALUE + TYPE_FLOAT + COMMA_SEPARATOR +
+                    PollutionContract.Event.COLUMN_NAME_GPS_LAT + TYPE_STRING + COMMA_SEPARATOR +
+                    PollutionContract.Event.COLUMN_NAME_GPS_LONG + TYPE_STRING + COMMA_SEPARATOR +
+                    PollutionContract.Event.COLUMN_NAME_POLL_VALUE + TYPE_STRING + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_SYNCED + TYPE_INTEGER + COMMA_SEPARATOR +
                     PollutionContract.Event.COLUMN_NAME_CHILD_ID + TYPE_STRING + ")";
 
