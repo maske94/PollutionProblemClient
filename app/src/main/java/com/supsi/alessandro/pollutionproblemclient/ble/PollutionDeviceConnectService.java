@@ -12,6 +12,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
+import com.supsi.alessandro.pollutionproblemclient.storage.PollutionSharedPreferences;
+
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
 
@@ -149,6 +153,9 @@ public class PollutionDeviceConnectService extends Service {
                         Log.v(TAG, String.format("%02X ", byteChar));
                     }
                     Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
+                    //TODO producer and consumer
+                    Event event = fromBytesToEvent(bytes);
+
                 }
 
 
@@ -171,6 +178,71 @@ public class PollutionDeviceConnectService extends Service {
 //                sendBroadcast(intent);
             }
         }
+    }
+
+    /**
+     * Converts an array of bytes into an {@link Event} object.
+     * The conversion is done by following the protocol signed with the wearable device that sends the array of bytes.
+     * The wearable device sends 19 bytes in total, their meaning is as follows:
+     *
+     * Bytes   0-1 : year of the timestamp as integer
+     * Byte      2 : month of the timestamp as integer
+     * Byte      3 : day of the timestamp as integer
+     * Byte      4 : hour of the timestamp as integer
+     * Byte      5 : minutes of the timestamp as integer
+     * Byte      6 : seconds of the timestamp as integer
+     * Bytes  7-10 : pollution value as float
+     * Bytes 11-14 : gps latitude as float
+     * Bytes 15-18 : gps longitude as float
+     *
+     * @param bytes The array of bytes to be converted
+     * @return The converted {@link Event} object
+     */
+    private static Event fromBytesToEvent(byte[] bytes) {
+
+        // Check on the bytes array dimension
+        if (bytes.length!=19){
+            Log.e(TAG, "fromBytesToEvent: The given array of bytes MUST contain 19 bytes");
+            return null;
+        }
+
+        /**
+         * Create timestamp
+         */
+        byte[] yearBytes = {bytes[0],bytes[1]};
+        int year = ByteBuffer.wrap(yearBytes).getInt();
+        int month = bytes[2];
+        int day = bytes[3];
+        int hour = bytes[4];
+        int minute = bytes[5];
+        int second = bytes[6];
+
+        String isoTimestamp = year+"-"+month+"-"+day+"T"+hour+":"+minute+":"+second;
+        Log.d(TAG, "fromBytesToEvent() ---> timestamp: "+isoTimestamp);
+
+        /**
+         * Create pollution value
+         */
+        byte[] pollValueBytes = {bytes[7],bytes[8],bytes[9],bytes[10]};
+        float pollValue = ByteBuffer.wrap(pollValueBytes).getFloat();
+
+        /**
+         * Create gps lat
+         */
+        byte[] gpsLatBytes = {bytes[11],bytes[12],bytes[13],bytes[14]};
+        float gpsLat = ByteBuffer.wrap(gpsLatBytes).getFloat();
+
+        /**
+         * Create gps long
+         */
+        byte[] gpsLongBytes = {bytes[15],bytes[16],bytes[17],bytes[18]};
+        float gpsLong = ByteBuffer.wrap(gpsLongBytes).getFloat();
+
+        /**
+         * Generate and return the new event
+         */
+        return new Event(null,null,pollValue,isoTimestamp,gpsLat,gpsLong);
+        //TODO implement method to convert deviceId into childId
     }
 
 }

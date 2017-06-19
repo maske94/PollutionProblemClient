@@ -208,6 +208,7 @@ public class PollutionProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+        //TODO implement update when events are sent to the server
         return 0;
     }
 
