@@ -16,6 +16,7 @@ import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 import com.supsi.alessandro.pollutionproblemclient.storage.PollutionSharedPreferences;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 import java.util.UUID;
 
@@ -155,6 +156,8 @@ public class PollutionDeviceConnectService extends Service {
                     Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
                     //TODO producer and consumer
                     Event event = fromBytesToEvent(bytes);
+                    Log.d(TAG, "onCharacteristicChanged() ---> generated event: "+event);
+
 
                 }
 
@@ -185,15 +188,15 @@ public class PollutionDeviceConnectService extends Service {
      * The conversion is done by following the protocol signed with the wearable device that sends the array of bytes.
      * The wearable device sends 19 bytes in total, their meaning is as follows:
      *
-     * Bytes   0-1 : year of the timestamp as integer
-     * Byte      2 : month of the timestamp as integer
-     * Byte      3 : day of the timestamp as integer
-     * Byte      4 : hour of the timestamp as integer
-     * Byte      5 : minutes of the timestamp as integer
-     * Byte      6 : seconds of the timestamp as integer
-     * Bytes  7-10 : pollution value as float
-     * Bytes 11-14 : gps latitude as float
-     * Bytes 15-18 : gps longitude as float
+     * Bytes     0 : year of the timestamp as integer
+     * Byte      1 : month of the timestamp as integer
+     * Byte      2 : day of the timestamp as integer
+     * Byte      3 : hour of the timestamp as integer
+     * Byte      4 : minutes of the timestamp as integer
+     * Byte      5 : seconds of the timestamp as integer
+     * Bytes   6-9 : pollution value as float
+     * Bytes 10-13 : gps latitude as float
+     * Bytes 14-17 : gps longitude as float
      *
      * @param bytes The array of bytes to be converted
      * @return The converted {@link Event} object
@@ -201,47 +204,54 @@ public class PollutionDeviceConnectService extends Service {
     private static Event fromBytesToEvent(byte[] bytes) {
 
         // Check on the bytes array dimension
-        if (bytes.length!=19){
+        if (bytes.length!=18){
             Log.e(TAG, "fromBytesToEvent: The given array of bytes MUST contain 19 bytes");
             return null;
         }
 
         /**
-         * Create timestamp
+         * Create timestamp.
          */
-        byte[] yearBytes = {bytes[0],bytes[1]};
-        int year = ByteBuffer.wrap(yearBytes).getInt();
-        int month = bytes[2];
-        int day = bytes[3];
-        int hour = bytes[4];
-        int minute = bytes[5];
-        int second = bytes[6];
-
+        int year = bytes[0];
+        // Add the constant 2000 to the year because we send only the
+        // 2 number of the year from the wearable device to the smart phone
+        // in order to save bytes
+        year+=2000;
+        int month = bytes[1];
+        int day = bytes[2];
+        int hour = bytes[3];
+        int minute = bytes[4];
+        int second = bytes[5];
+        //TODO check if each piece is less than 10 and in case add a 0 before
         String isoTimestamp = year+"-"+month+"-"+day+"T"+hour+":"+minute+":"+second;
-        Log.d(TAG, "fromBytesToEvent() ---> timestamp: "+isoTimestamp);
 
         /**
          * Create pollution value
          */
-        byte[] pollValueBytes = {bytes[7],bytes[8],bytes[9],bytes[10]};
-        float pollValue = ByteBuffer.wrap(pollValueBytes).getFloat();
+        byte[] pollValueBytes = {bytes[6],bytes[7],bytes[8],bytes[9]};
+        float pollValue = ByteBuffer.wrap(pollValueBytes).order(ByteOrder.LITTLE_ENDIAN).getFloat();
 
         /**
          * Create gps lat
          */
-        byte[] gpsLatBytes = {bytes[11],bytes[12],bytes[13],bytes[14]};
-        float gpsLat = ByteBuffer.wrap(gpsLatBytes).getFloat();
+        byte[] gpsLatBytes = {bytes[10],bytes[11],bytes[12],bytes[13]};
+        float gpsLat = ByteBuffer.wrap(gpsLatBytes).order(ByteOrder.LITTLE_ENDIAN).getFloat();
 
         /**
          * Create gps long
          */
-        byte[] gpsLongBytes = {bytes[15],bytes[16],bytes[17],bytes[18]};
-        float gpsLong = ByteBuffer.wrap(gpsLongBytes).getFloat();
+        byte[] gpsLongBytes = {bytes[14],bytes[15],bytes[16],bytes[17]};
+        float gpsLong = ByteBuffer.wrap(gpsLongBytes).order(ByteOrder.LITTLE_ENDIAN).getFloat();
 
         /**
          * Generate and return the new event
          */
-        return new Event(null,null,pollValue,isoTimestamp,gpsLat,gpsLong);
+        String username = PollutionSharedPreferences.getInstance().getStoredUsername();
+        if(username==null){
+            Log.e(TAG, "fromBytesToEvent() --> stored username is NULL");
+        }
+
+        return new Event(username,null,pollValue,isoTimestamp,gpsLat,gpsLong);
         //TODO implement method to convert deviceId into childId
     }
 
