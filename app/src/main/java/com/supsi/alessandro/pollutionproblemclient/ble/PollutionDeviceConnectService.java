@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 
 import java.nio.ByteBuffer;
@@ -149,14 +150,11 @@ public class PollutionDeviceConnectService extends Service {
                 if (bytes != null && bytes.length > 0) {
                     final StringBuilder stringBuilder = new StringBuilder(bytes.length);
                     for (byte byteChar : bytes) {
-
                         stringBuilder.append(String.format("%02X ", byteChar));
-                        Log.v(TAG, String.format("%02X ", byteChar));
+                        //Log.v(TAG, String.format("%02X ", byteChar));
                     }
                     Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
-                    //TODO producer and consumer
-                    // TODO get username and child and pass them to the next method call
-                    Event event = buildEventFromBytesArray(null,null,bytes);
+                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(),PollutionApplication.getChildId(gatt.getDevice().getAddress()),bytes);
                     Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
 
 
