@@ -11,9 +11,35 @@
         android:id="@+id/b_start_scan"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:layout_marginLeft="-57dp"
-        android:layout_marginTop="82dp"
+        android:layout_marginTop="-8dp"
         android:text="Start scan"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="-35dp" />
+
+    <Button
+        android:id="@+id/b_stop_collecting"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginTop="115dp"
+        android:text="Stop collecting"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/b_start_collecting"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginLeft="-50dp"
+        android:layout_marginTop="115dp"
+        android:text="Start collecting"
         android:textAlignment="center"
         android:textAllCaps="false"
         android:textSize="20sp"
@@ -29,11 +55,13 @@
         android:textAllCaps="false"
         android:textSize="20sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="136dp"
+        android:layout_marginTop="-34dp" />
 
     <TextView
         android:id="@+id/tv_poll_data"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="300dp"
         android:background="@android:color/darker_gray"
         android:maxLines="500"
@@ -45,4 +73,25 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/tv_device_name_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Device:"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="70dp"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="17dp"
+        android:text="no device"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="70dp"
+        app:layout_constraintLeft_toRightOf="@+id/tv_device_name_label"
+        android:layout_marginLeft="8dp" />
+
 </android.support.constraint.ConstraintLayout>

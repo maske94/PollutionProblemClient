@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private PollutionDeviceConnectService mPollDeviceConnectService;
     private BluetoothDevice mPollDeviceToConnect;
-    private TextView mPollutionDataTextview;
+    private TextView mPollutionDataTextView;
+    private TextView mDeviceNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,23 +52,47 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mPollutionDataTextview = (TextView) findViewById(R.id.tv_poll_data);
-        mPollutionDataTextview.setMovementMethod(new ScrollingMovementMethod());
+        findViewById(R.id.b_start_collecting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick() ---> clicked start collecting button");
+                if(mPollDeviceToConnect==null){
+                    Log.e(TAG, "\t\t ---> device to connect is NULL");
+                    return;
+                }
+                // Start the pollution devices connect service
+                Intent intent = new Intent(MainActivity.this, PollutionDeviceConnectService.class);
+                bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+            }
+
+        });
+
+        findViewById(R.id.b_stop_collecting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick() ---> clicked stop collecting button");
+                if(mPollDeviceConnectService==null){
+                    Log.e(TAG, "\t\t ---> service already disconnected");
+                    return;
+                }
+                unbindService(mServiceConnection);
+            }
+        });
+
+        mPollutionDataTextView = (TextView) findViewById(R.id.tv_poll_data);
+        mDeviceNameTextView = (TextView) findViewById(R.id.tv_device_name);
+        mPollutionDataTextView.setMovementMethod(new ScrollingMovementMethod());
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        // Start the pollution devices connect service
-        Intent intent = new Intent(this, PollutionDeviceConnectService.class);
-        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(mServiceConnection);
     }
 
     @Override
@@ -90,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     BluetoothDevice selectedDevice = data.getParcelableExtra(Constants.EXTRA_ACTIVITY_RESULT);
                     Log.d(TAG, "onActivityResult() --> selected device : " + selectedDevice.getName());
                     mPollDeviceToConnect = selectedDevice;
-
+                    mDeviceNameTextView.setText(selectedDevice.getName());
                 }
             }
         }
@@ -120,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (Constants.ACTION_POLLUTION_UPDATE.equals(action)) {
-                mPollutionDataTextview.append(intent.getStringExtra(Constants.EXTRA_NEW_POLLUTION_DATA)+"\n");
+                mPollutionDataTextView.append(intent.getStringExtra(Constants.EXTRA_NEW_POLLUTION_DATA)+"\n");
             }
         }
     };

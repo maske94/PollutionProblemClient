@@ -33,13 +33,13 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
         setContentView(R.layout.activity_map);
 
         // Test: add some events to db
-        try {
-            addEvents();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (OperationApplicationException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            addEvents();
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        } catch (OperationApplicationException e) {
+//            e.printStackTrace();
+//        }
 
         // Get the SupportMapFragment and request notification when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

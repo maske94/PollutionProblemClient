@@ -7,19 +7,24 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
+import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -32,6 +37,7 @@ public class PollutionDeviceConnectService extends Service {
 
     private static final String TAG = PollutionDeviceConnectService.class.getSimpleName();
     private BleManager mBleManager;
+    private ArrayList<Event> mEvents;
 
     /**
      * Service binding related stuffs
@@ -48,6 +54,7 @@ public class PollutionDeviceConnectService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind()");
         mBleManager = BleManager.getInstance();
+        mEvents = new ArrayList<>();
         return mBinder;
     }
 
@@ -58,6 +65,15 @@ public class PollutionDeviceConnectService extends Service {
         // such that resources are cleaned up properly.  In this particular example, close() is
         // invoked when the UI is disconnected from the Service.
         mBleManager.close();
+
+        // Store into the local db all the events that this service has gathered
+        try {
+            Log.d(TAG, "onUnbind() ---> storing all the events received from the wearable device");
+            PollutionProvider.storeEvents(mEvents,getContentResolver());
+        } catch (RemoteException | OperationApplicationException e) {
+            e.printStackTrace();
+        }
+
         return super.onUnbind(intent);
     }
 
@@ -140,51 +156,64 @@ public class PollutionDeviceConnectService extends Service {
 
             if (UUID.fromString(BleConstants.CHARACTERISTIC_TO_DISCOVER).equals(characteristic.getUuid())) {
 
-//                byte[] bytes = characteristic.getValue();
-//
-//                //Log.d(TAG, "\t---> received bytes: " + Arrays.toString(bytes));
-//                //String str = new String(bytes);
-//                //Log.i(TAG, "\t--> received string: " + str);
-//
-//                if (bytes != null && bytes.length > 0) {
-//                    final StringBuilder stringBuilder = new StringBuilder(bytes.length);
-//                    for (byte byteChar : bytes) {
-//                        stringBuilder.append(String.format("%02X ", byteChar));
-//                        //Log.v(TAG, String.format("%02X ", byteChar));
-//                    }
-//                    Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
-//                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(), PollutionApplication.getChildId(gatt.getDevice().getAddress()), bytes);
-//
-//                    if (event == null) {
-//                        Log.e(TAG, "onCharacteristicChanged() ---> event is NULL");
-//                    } else {
-//                        Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
-//                        sendBroadcast(event.toString());
-//                    }
-//                }
+                //byte[] bytes = characteristic.getValue();
+                Float gpsLat = new Random().nextFloat()+46;
+                byte[] latArray = ByteBuffer.allocate(4).putFloat(gpsLat).array();
+                Float gpsLong = new Random().nextFloat()+8;
+                byte[] longArray = ByteBuffer.allocate(4).putFloat(gpsLong).array();
 
+                Log.e(TAG, "onCharacteristicChanged() ---> generated random position: "+gpsLat+"   "+gpsLong );
 
-                // Heart measurement monitor characteristic
-                int flag = characteristic.getProperties();
-                int format = -1;
-                if ((flag & 0x01) != 0) {
-                    format = BluetoothGattCharacteristic.FORMAT_UINT16;
-                    //Log.d(TAG, "                           ---> Heart rate format UINT16.");
-                } else {
-                    format = BluetoothGattCharacteristic.FORMAT_UINT8;
-                    //Log.d(TAG, "                           ---> Heart rate format UINT8.");
+                byte[] bytes = {0x01, 0x01, 0x09, 0x0A, 0x0B, 0x0C, // Timestamp
+                        0x52, (byte) 0xB8, 0x1E, 0x3F, // Pollution value
+                        latArray[3], latArray[2], latArray[1], latArray[0], // gps lat
+                        longArray[3], longArray[2], longArray[1], longArray[0]};// gps long
+
+                //Log.d(TAG, "\t---> received bytes: " + Arrays.toString(bytes));
+                //String str = new String(bytes);
+                //Log.i(TAG, "\t--> received string: " + str);
+
+                if (bytes != null && bytes.length > 0) {
+                    final StringBuilder stringBuilder = new StringBuilder(bytes.length);
+                    for (byte byteChar : bytes) {
+                        stringBuilder.append(String.format("%02X ", byteChar));
+                        //Log.v(TAG, String.format("%02X ", byteChar));
+                    }
+                    Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
+                   //Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(), PollutionApplication.getChildId(gatt.getDevice().getAddress()), bytes);
+                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(),"prova", bytes);
+
+                    if (event == null) {
+                        Log.e(TAG, "onCharacteristicChanged() ---> event is NULL");
+                    } else {
+                        Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
+                        sendBroadcast(event.toString());
+                        mEvents.add(event);
+                    }
                 }
-                final int heartRate = characteristic.getIntValue(format, 1);
-                Log.d(TAG, "\t---> Received heart rate: " + heartRate);
-                sendBroadcast(heartRate + "");
+
+
+//                // Heart measurement monitor characteristic
+//                int flag = characteristic.getProperties();
+//                int format = -1;
+//                if ((flag & 0x01) != 0) {
+//                    format = BluetoothGattCharacteristic.FORMAT_UINT16;
+//                    //Log.d(TAG, "                           ---> Heart rate format UINT16.");
+//                } else {
+//                    format = BluetoothGattCharacteristic.FORMAT_UINT8;
+//                    //Log.d(TAG, "                           ---> Heart rate format UINT8.");
+//                }
+//                final int heartRate = characteristic.getIntValue(format, 1);
+//                Log.d(TAG, "\t---> Received heart rate: " + heartRate);
+//                sendBroadcast(heartRate + "");
             }
         }
     }
 
     /**
-     * Creates a intent and send it to the broadcast receivers.
+     * Creates an intent and send it to the broadcast receivers.
      *
-     * @param s The string to be send to the broadcast receivers
+     * @param s The string to be sent to the broadcast receivers
      */
     private void sendBroadcast(String s) {
         Intent intent = new Intent();
@@ -224,7 +253,7 @@ public class PollutionDeviceConnectService extends Service {
          */
         int year = bytes[0];
         // Add the constant 2000 to the year because we send only the
-        // 2 number of the year from the wearable device to the smart phone
+        // last 2 number of the year from the wearable device to the smart phone
         // in order to save bytes
         year += 2000;
         int month = bytes[1];
@@ -260,7 +289,7 @@ public class PollutionDeviceConnectService extends Service {
          * Generate and return the new event
          */
         if (username == null) {
-            Log.e(TAG, "buildEventFromBytesArray() --> stored username is NULL");
+            Log.e(TAG, "buildEventFromBytesArray() --> username is NULL");
         }
 
         return new Event(username, childId, pollValue, isoTimestamp, gpsLat, gpsLong);

@@ -117,16 +117,16 @@ public class Event{
 
     @Override
     public String toString() {
-        return "Event{" +
-                "eventId='" + eventId + '\'' +
-                ", username='" + username + '\'' +
-                ", childId='" + childId + '\'' +
-                ", pollutionValue='" + pollutionValue + '\'' +
-                ", timeStamp='" + timeStamp + '\'' +
-                ", gpsLat='" + gpsLat + '\'' +
-                ", gpsLong='" + gpsLong + '\'' +
-                ", synced=" + synced +
-                '}';
+        return "{" +
+                "eventId='" + eventId + '\'' + "\n" +
+                "username='" + username + '\'' + "\n" +
+                "childId='" + childId + '\'' + "\n" +
+                "pollValue='" + pollutionValue + '\'' + "\n" +
+                "timeStamp='" + timeStamp + '\'' + "\n" +
+                "gpsLat='" + gpsLat + '\'' + "\n" +
+                "gpsLong='" + gpsLong + '\'' + "\n" +
+                "synced=" + synced +
+                '}' + "\n";
     }
 
     @Override
