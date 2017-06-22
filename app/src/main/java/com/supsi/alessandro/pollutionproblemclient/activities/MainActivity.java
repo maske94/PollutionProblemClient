@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick() ---> clicked start map button");
-                Intent i = new Intent(MainActivity.this, MapActivity.class);
+                Intent i = new Intent(MainActivity.this, PollutionMapActivity.class);
                 startActivity(i);
             }
         });

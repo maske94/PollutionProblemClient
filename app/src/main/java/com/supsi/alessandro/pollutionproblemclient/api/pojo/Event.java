@@ -91,12 +91,20 @@ public class Event{
         return gpsLat;
     }
 
+    public double getDoubleGpsLat() {
+        return Double.parseDouble(gpsLat);
+    }
+
     public void setGpsLat(String gpsLat) {
         this.gpsLat = gpsLat;
     }
 
     public String getGpsLong() {
         return gpsLong;
+    }
+
+    public double getDoubleGpsLong() {
+        return Double.parseDouble(gpsLong);
     }
 
     public void setGpsLong(String gpsLong) {
