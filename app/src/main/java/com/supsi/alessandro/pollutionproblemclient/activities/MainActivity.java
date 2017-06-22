@@ -1,4 +1,4 @@
-package com.supsi.alessandro.pollutionproblemclient;
+package com.supsi.alessandro.pollutionproblemclient.activities;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.supsi.alessandro.pollutionproblemclient.Constants;
+import com.supsi.alessandro.pollutionproblemclient.R;
 import com.supsi.alessandro.pollutionproblemclient.ble.BleConstants;
 import com.supsi.alessandro.pollutionproblemclient.ble.PollutionDeviceConnectService;
 import com.supsi.alessandro.pollutionproblemclient.ble.PollutionDevicesScanActivity;
@@ -37,6 +39,15 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onClick() ---> clicked start scan button");
                 Intent i = new Intent(MainActivity.this, PollutionDevicesScanActivity.class);
                 startActivityForResult(i, BleConstants.POLL_DEVICES_SCAN_ACTIVITY_RESULT);
+            }
+        });
+
+        findViewById(R.id.b_start_map).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick() ---> clicked start map button");
+                Intent i = new Intent(MainActivity.this, MapActivity.class);
+                startActivity(i);
             }
         });
 

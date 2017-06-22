@@ -3,4 +3,5 @@
     <string name="unknown_device">Unknown device</string>
     <string name="poll_devices_scanning">Scanning pollution device</string>
     <string name="label_received_data">Received data:\n</string>
+    <string name="google_api_key">AIzaSyDjW0O1_BOUJTUVw7VTZk7jWJhswnatWBY</string>
 </resources>
