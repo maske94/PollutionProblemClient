@@ -2,4 +2,5 @@
     <string name="app_name">PollutionProblemClient</string>
     <string name="unknown_device">Unknown device</string>
     <string name="poll_devices_scanning">Scanning pollution device</string>
+    <string name="label_received_data">Received data:\n</string>
 </resources>

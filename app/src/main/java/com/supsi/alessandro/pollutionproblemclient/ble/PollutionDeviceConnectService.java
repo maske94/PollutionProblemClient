@@ -153,10 +153,14 @@ public class PollutionDeviceConnectService extends Service {
 //                        //Log.v(TAG, String.format("%02X ", byteChar));
 //                    }
 //                    Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
-//                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(),PollutionApplication.getChildId(gatt.getDevice().getAddress()),bytes);
-//                    Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
+//                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(), PollutionApplication.getChildId(gatt.getDevice().getAddress()), bytes);
 //
-//
+//                    if (event == null) {
+//                        Log.e(TAG, "onCharacteristicChanged() ---> event is NULL");
+//                    } else {
+//                        Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
+//                        sendBroadcast(event.toString());
+//                    }
 //                }
 
 
@@ -172,13 +176,21 @@ public class PollutionDeviceConnectService extends Service {
                 }
                 final int heartRate = characteristic.getIntValue(format, 1);
                 Log.d(TAG, "\t---> Received heart rate: " + heartRate);
-
-                Intent intent = new Intent();
-                intent.setAction(Constants.ACTION_POLLUTION_UPDATE);
-                intent.putExtra(Constants.EXTRA_NEW_POLLUTION_DATA,heartRate+"");
-                sendBroadcast(intent);
+                sendBroadcast(heartRate + "");
             }
         }
+    }
+
+    /**
+     * Creates a intent and send it to the broadcast receivers.
+     *
+     * @param s The string to be send to the broadcast receivers
+     */
+    private void sendBroadcast(String s) {
+        Intent intent = new Intent();
+        intent.setAction(Constants.ACTION_POLLUTION_UPDATE);
+        intent.putExtra(Constants.EXTRA_NEW_POLLUTION_DATA, s);
+        sendBroadcast(intent);
     }
 
     /**
@@ -199,7 +211,7 @@ public class PollutionDeviceConnectService extends Service {
      * @param bytes The array of bytes to be converted
      * @return The converted {@link Event} object
      */
-    public static Event buildEventFromBytesArray(String username,String childId,byte[] bytes) {
+    public static Event buildEventFromBytesArray(String username, String childId, byte[] bytes) {
 
         // Check on the bytes array dimension
         if (bytes.length != 18) {

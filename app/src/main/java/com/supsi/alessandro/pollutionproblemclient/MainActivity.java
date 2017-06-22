@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private PollutionDeviceConnectService mPollDeviceConnectService;
     private BluetoothDevice mPollDeviceToConnect;
-    private TextView mPollutionData;
+    private TextView mPollutionDataTextview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mPollutionData = (TextView) findViewById(R.id.tv_poll_data);
+        mPollutionDataTextview = (TextView) findViewById(R.id.tv_poll_data);
+        mPollutionDataTextview.setMovementMethod(new ScrollingMovementMethod());
 
     }
 
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (Constants.ACTION_POLLUTION_UPDATE.equals(action)) {
-                mPollutionData.setText(intent.getStringExtra(Constants.EXTRA_NEW_POLLUTION_DATA));
+                mPollutionDataTextview.append(intent.getStringExtra(Constants.EXTRA_NEW_POLLUTION_DATA)+"\n");
             }
         }
     };
