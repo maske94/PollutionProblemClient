@@ -34,8 +34,6 @@ import java.util.UUID;
 public class PollutionDevicesScanActivity extends ListActivity {
 
     private static final String TAG = PollutionDevicesScanActivity.class.getSimpleName();
-    private static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_H10_RADIO_UUID;
-
     private BleManager mBleManager;
     private PollutionDeviceListAdapter mPollutionDeviceListAdapter;
 
@@ -54,15 +52,15 @@ public class PollutionDevicesScanActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mBleManager.initialize();
         discoverPollutionDevices();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause()");
+        mPollutionDeviceListAdapter.clear();
         mBleManager.stopBleScan(new PollutionScanCallback());
-        mBleManager.close();
     }
 
     /**
@@ -103,7 +101,7 @@ public class PollutionDevicesScanActivity extends ListActivity {
     private List<ScanFilter> buildScanFilters() {
         List<ScanFilter> scanFilters = new ArrayList<>();
         scanFilters.add(new ScanFilter.Builder()
-                .setServiceUuid(new ParcelUuid(UUID.fromString(SERVICE_TO_DISCOVER)))
+                .setServiceUuid(new ParcelUuid(UUID.fromString(BleConstants.SERVICE_TO_DISCOVER)))
                 .build());
         return scanFilters;
     }
@@ -173,6 +171,7 @@ public class PollutionDevicesScanActivity extends ListActivity {
 
         public void clear() {
             mLeDevices.clear();
+            notifyDataSetChanged();
         }
 
         @Override

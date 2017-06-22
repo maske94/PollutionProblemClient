@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 
@@ -30,9 +31,6 @@ import java.util.UUID;
 public class PollutionDeviceConnectService extends Service {
 
     private static final String TAG = PollutionDeviceConnectService.class.getSimpleName();
-    private static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_H10_RADIO_UUID;
-    private static final String CHARACTERISTIC_TO_DISCOVER = BleConstants.H10_RADIO_CHARACTERISTIC_UUID;
-
     private BleManager mBleManager;
 
     /**
@@ -50,7 +48,6 @@ public class PollutionDeviceConnectService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind()");
         mBleManager = BleManager.getInstance();
-        mBleManager.initialize();
         return mBinder;
     }
 
@@ -83,11 +80,13 @@ public class PollutionDeviceConnectService extends Service {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             if (BluetoothGatt.GATT_SUCCESS == status) {
+                Log.i(TAG, "onConnectionStateChange() ---> new state: " + newState);
                 if (BluetoothGatt.STATE_CONNECTED == newState) {
                     Log.i(TAG, "onConnectionStateChange() ---> Connected to " + gatt.getDevice().getName());
                     gatt.discoverServices();
                 } else if (BluetoothGatt.STATE_DISCONNECTED == newState) {
                     Log.i(TAG, "onConnectionStateChange() ---> Disconnected from " + gatt.getDevice().getName());
+                    mBleManager.close();
                 }
             }
         }
@@ -106,7 +105,7 @@ public class PollutionDeviceConnectService extends Service {
                 Log.i(TAG, "\t---> service UUID: " + s.getUuid());
 
                 // Check if the current service is the one we are looking for
-                if (UUID.fromString(SERVICE_TO_DISCOVER).equals(s.getUuid())) {
+                if (UUID.fromString(BleConstants.SERVICE_TO_DISCOVER).equals(s.getUuid())) {
 
                     List<BluetoothGattCharacteristic> characteristics = s.getCharacteristics();
                     Log.i(TAG, "\t\t---> characteristics number :" + characteristics.size());
@@ -116,7 +115,7 @@ public class PollutionDeviceConnectService extends Service {
                         Log.i(TAG, "\t\t\t---> characteristic UUID :" + c.getUuid());
 
                         // Check for the wanted characteristic
-                        if (UUID.fromString(CHARACTERISTIC_TO_DISCOVER).equals(c.getUuid())) {
+                        if (UUID.fromString(BleConstants.CHARACTERISTIC_TO_DISCOVER).equals(c.getUuid())) {
 
                             Log.i(TAG, "\t\t\t\t---> Found the wanted characteristic " + c.getUuid() + " , enabling notification...");
 
@@ -139,45 +138,45 @@ public class PollutionDeviceConnectService extends Service {
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
             Log.i(TAG, "onCharacteristicChanged() ---> " + characteristic.getUuid());
 
-            if (UUID.fromString(CHARACTERISTIC_TO_DISCOVER).equals(characteristic.getUuid())) {
+            if (UUID.fromString(BleConstants.CHARACTERISTIC_TO_DISCOVER).equals(characteristic.getUuid())) {
 
-                byte[] bytes = characteristic.getValue();
-
-                //Log.d(TAG, "\t---> received bytes: " + Arrays.toString(bytes));
-                //String str = new String(bytes);
-                //Log.i(TAG, "\t--> received string: " + str);
-
-                if (bytes != null && bytes.length > 0) {
-                    final StringBuilder stringBuilder = new StringBuilder(bytes.length);
-                    for (byte byteChar : bytes) {
-                        stringBuilder.append(String.format("%02X ", byteChar));
-                        //Log.v(TAG, String.format("%02X ", byteChar));
-                    }
-                    Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
-                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(),PollutionApplication.getChildId(gatt.getDevice().getAddress()),bytes);
-                    Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
-
-
-                }
-
-
-//                // Heart measurement monitor characteristic
-//                int flag = characteristic.getProperties();
-//                int format = -1;
-//                if ((flag & 0x01) != 0) {
-//                    format = BluetoothGattCharacteristic.FORMAT_UINT16;
-//                    //Log.d(TAG, "                           ---> Heart rate format UINT16.");
-//                } else {
-//                    format = BluetoothGattCharacteristic.FORMAT_UINT8;
-//                    //Log.d(TAG, "                           ---> Heart rate format UINT8.");
-//                }
-//                final int heartRate = characteristic.getIntValue(format, 1);
-//                Log.d(TAG, "\t---> Received heart rate: " + heartRate);
+//                byte[] bytes = characteristic.getValue();
 //
-//                Intent intent = new Intent();
-//                intent.setAction(Constants.ACTION_POLLUTION_UPDATE);
-//                intent.putExtra(Constants.EXTRA_NEW_POLLUTION_DATA,heartRate+"");
-//                sendBroadcast(intent);
+//                //Log.d(TAG, "\t---> received bytes: " + Arrays.toString(bytes));
+//                //String str = new String(bytes);
+//                //Log.i(TAG, "\t--> received string: " + str);
+//
+//                if (bytes != null && bytes.length > 0) {
+//                    final StringBuilder stringBuilder = new StringBuilder(bytes.length);
+//                    for (byte byteChar : bytes) {
+//                        stringBuilder.append(String.format("%02X ", byteChar));
+//                        //Log.v(TAG, String.format("%02X ", byteChar));
+//                    }
+//                    Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
+//                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(),PollutionApplication.getChildId(gatt.getDevice().getAddress()),bytes);
+//                    Log.d(TAG, "onCharacteristicChanged() ---> generated event: " + event);
+//
+//
+//                }
+
+
+                // Heart measurement monitor characteristic
+                int flag = characteristic.getProperties();
+                int format = -1;
+                if ((flag & 0x01) != 0) {
+                    format = BluetoothGattCharacteristic.FORMAT_UINT16;
+                    //Log.d(TAG, "                           ---> Heart rate format UINT16.");
+                } else {
+                    format = BluetoothGattCharacteristic.FORMAT_UINT8;
+                    //Log.d(TAG, "                           ---> Heart rate format UINT8.");
+                }
+                final int heartRate = characteristic.getIntValue(format, 1);
+                Log.d(TAG, "\t---> Received heart rate: " + heartRate);
+
+                Intent intent = new Intent();
+                intent.setAction(Constants.ACTION_POLLUTION_UPDATE);
+                intent.putExtra(Constants.EXTRA_NEW_POLLUTION_DATA,heartRate+"");
+                sendBroadcast(intent);
             }
         }
     }

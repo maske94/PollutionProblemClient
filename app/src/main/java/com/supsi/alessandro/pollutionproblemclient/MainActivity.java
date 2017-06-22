@@ -44,6 +44,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        // Start the pollution devices connect service
+        Intent intent = new Intent(this, PollutionDeviceConnectService.class);
+        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(mServiceConnection);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mPollutionDataReceiver, makeGattUpdateIntentFilter());
@@ -63,9 +77,7 @@ public class MainActivity extends AppCompatActivity {
                     BluetoothDevice selectedDevice = data.getParcelableExtra(Constants.EXTRA_ACTIVITY_RESULT);
                     Log.d(TAG, "onActivityResult() --> selected device : " + selectedDevice.getName());
                     mPollDeviceToConnect = selectedDevice;
-                    // Start the pollution devices connect service
-                    Intent intent = new Intent(this, PollutionDeviceConnectService.class);
-                    bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
+
                 }
             }
         }
@@ -77,8 +89,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             Log.d(TAG, "onServiceConnected()");
-            mPollDeviceConnectService = ((PollutionDeviceConnectService.LocalBinder) service).getService();
-            mPollDeviceConnectService.connectPollutionDevice(mPollDeviceToConnect);
+            if (mPollDeviceToConnect != null) {
+                mPollDeviceConnectService = ((PollutionDeviceConnectService.LocalBinder) service).getService();
+                mPollDeviceConnectService.connectPollutionDevice(mPollDeviceToConnect);
+            }
         }
 
         @Override

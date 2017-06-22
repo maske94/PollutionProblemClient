@@ -47,7 +47,7 @@ class BleManager {
      * Private constructor in order to implement singleton pattern
      */
     private BleManager() {
-
+        initialize();
     }
 
     /**
@@ -60,7 +60,7 @@ class BleManager {
     /**
      * Initializes the Bluetooth adapter.
      */
-    public void initialize() {
+    private void initialize() {
         if (mBluetoothAdapter == null) {
             final BluetoothManager bluetoothManager = (BluetoothManager) PollutionApplication.getAppContext().getSystemService(Context.BLUETOOTH_SERVICE);
             mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -122,23 +122,29 @@ class BleManager {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.i(TAG, "stop scan after " + BleConstants.SCAN_PERIOD + " milliseconds");
+                Log.i(TAG, "scan stopped after " + BleConstants.SCAN_PERIOD + " milliseconds");
                 mBluetoothLeScanner.stopScan(scanCallback);
             }
         }, BleConstants.SCAN_PERIOD);
     }
 
     /**
-     * Stop the ble devices scanning.
+     * Stops the ble devices scanning.
      *
      * @param scanCallback Callback to call after stop the scan
      */
     void stopBleScan(ScanCallback scanCallback) {
-        if (mBluetoothAdapter == null) {
-            Log.w(TAG, "stopBleScan() ---> bluetooth adapter NOT initialized");
+        Log.d(TAG, "stopBleScan()");
+
+        if(!isBleEnabled()){
+            Log.e(TAG, "stopBleScan() ---> BLE is not enabled");
             return;
         }
 
+        if (mBluetoothAdapter == null) {
+            Log.e(TAG, "stopBleScan() ---> bluetooth adapter NOT initialized");
+            return;
+        }
         mBluetoothAdapter.getBluetoothLeScanner().stopScan(scanCallback);
     }
 
@@ -151,6 +157,12 @@ class BleManager {
     void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
+            return;
+        }
+
+        // Check if there is already a device connected
+        if(mBluetoothGatt!=null){
+            Log.e(TAG, "connectToDevice() ---> Phone is already connected with a wearable device.");
             return;
         }
 
@@ -172,11 +184,19 @@ class BleManager {
             return false;
         }
 
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
-        if (device == null) {
-            Log.w(TAG, "connectToDevice() ---> Device address not found.  Unable to connect.");
+        // Check if there is already a device connected
+        if(mBluetoothGatt!=null){
+            Log.e(TAG, "connectToDevice() ---> Phone is already connected with a wearable device.");
             return false;
         }
+
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
+        if (device == null) {
+            Log.e(TAG, "connectToDevice() ---> Device address not found.  Unable to connect.");
+            return false;
+        }
+
+
         mBluetoothGatt = device.connectGatt(PollutionApplication.getAppContext(), false, mBluetoothGattCallback);
         return true;
     }
@@ -200,15 +220,8 @@ class BleManager {
      * released properly.
      */
     void close() {
-        if (mBluetoothAdapter == null) {
-            Log.w(TAG, "close() ---> bluetooth adapter NOT initialized");
-            return;
-        }
-
-        mBluetoothAdapter = null;
-
         if (mBluetoothGatt == null) {
-            Log.w(TAG, "close() ---> bluetooth gatt NOT initialized");
+            Log.e(TAG, "close() ---> bluetooth gatt NOT initialized");
             return;
         }
 
@@ -223,7 +236,6 @@ class BleManager {
      * @param c    the characteristic to enable the notification
      */
     void enableNotification(BluetoothGatt gatt, BluetoothGattCharacteristic c) {
-        //TODO use the bluetooth gatt of this class and not that one pass as parameter
         gatt.setCharacteristicNotification(c, true);
         // Get the configuration descriptor and enable the notification
         // 0x2902 org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
