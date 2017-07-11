@@ -10,6 +10,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.supsi.alessandro.pollutionproblemclient.R;
@@ -35,9 +36,7 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
         // Test: add some events to db
 //        try {
 //            addEvents();
-//        } catch (RemoteException e) {
-//            e.printStackTrace();
-//        } catch (OperationApplicationException e) {
+//        } catch (RemoteException | OperationApplicationException e) {
 //            e.printStackTrace();
 //        }
 
@@ -49,10 +48,12 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
 
     private void addEvents() throws RemoteException, OperationApplicationException {
         ArrayList<Event> events = new ArrayList<>();
-        events.add(new Event("maske94", "prova", "90", "2017-06-22T22:03:00", "46.1485418", "9.308567700000026"));
-        events.add(new Event("maske94", "prova", "90", "2017-06-22T22:03:00", "46.2485418", "9.308567700000026"));
-        events.add(new Event("maske94", "prova", "90", "2017-06-22T22:03:00", "46.3485418", "9.308567700000026"));
-        events.add(new Event("maske94", "prova", "90", "2017-06-22T22:03:00", "46.4485418", "9.308567700000026"));
+        events.add(new Event("maske94", "prova", "10", "2017-06-22T22:03:00", "46.0085418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "20", "2017-06-22T22:03:00", "46.0185418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "40", "2017-06-22T22:03:00", "46.0285418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "70", "2017-06-22T22:03:00", "46.0385418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "200", "2017-06-22T22:03:00", "46.0485418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "300", "2017-06-22T22:03:00", "46.0585418", "8.951052000000004"));
         PollutionProvider.storeEvents(events, getContentResolver());
     }
 
@@ -86,12 +87,48 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
          */
         for (Event e : events) {
             LatLng eventPosition = new LatLng(e.getDoubleGpsLat(), e.getDoubleGpsLong());
-            googleMap.addMarker(new MarkerOptions().position(eventPosition));
+            googleMap.addMarker(new MarkerOptions().position(eventPosition)
+                    .title(e.getPollutionValue())
+                    .icon(BitmapDescriptorFactory.defaultMarker(getColor(Float.parseFloat(e.getPollutionValue())))));
         }
 
-        LatLng gravedona = new LatLng(events.get(0).getDoubleGpsLat(),events.get(0).getDoubleGpsLat());
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(gravedona));
+        LatLng lugano = new LatLng(46.0036778d,8.951052000000004d);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(lugano));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
     }
+
+    /**
+     * Computes the color of the marker depending on
+     * the pollution value.
+     * The way that is used to choose the color
+     * is based on the standard PM2.5 AQI scale.
+     * {@see http://aqicn.org/faq/2013-09-09/revised-pm25-aqi-breakpoints/}
+     *
+     * @param pollValue The given pollution value.
+     * @return A float representing the color on a color wheel.
+     */
+    private float getColor(float pollValue){
+        if(pollValue <= 12.0f){
+            Log.d(TAG, "getColor: Good");
+            return BitmapDescriptorFactory.HUE_GREEN;
+        }else if(pollValue <= 35.4f){
+            Log.d(TAG, "getColor: Moderate");
+            return BitmapDescriptorFactory.HUE_YELLOW;
+        }else if(pollValue <= 55.4f){
+            Log.d(TAG, "getColor: Unhealthy for Sensitive Groups");
+            return BitmapDescriptorFactory.HUE_ORANGE;
+        }else if(pollValue <= 150.4f){
+            Log.d(TAG, "getColor: Unhealthy");
+            return BitmapDescriptorFactory.HUE_RED;
+        }else if(pollValue <= 250.4f){
+            Log.d(TAG, "getColor: Very Unhealthy");
+            return BitmapDescriptorFactory.HUE_VIOLET;
+        }else{
+            Log.d(TAG, "getColor: Hazardous");
+            return BitmapDescriptorFactory.HUE_VIOLET-20;
+        }
+    }
+
+
 }
 

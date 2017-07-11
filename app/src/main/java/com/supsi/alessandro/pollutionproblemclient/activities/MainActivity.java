@@ -19,7 +19,7 @@ import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.R;
 import com.supsi.alessandro.pollutionproblemclient.ble.BleConstants;
 import com.supsi.alessandro.pollutionproblemclient.ble.PollutionDeviceConnectService;
-import com.supsi.alessandro.pollutionproblemclient.ble.PollutionDevicesScanActivity;
+import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,6 +76,14 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 unbindService(mServiceConnection);
+            }
+        });
+
+        findViewById(R.id.b_clear_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick() ---> clicked clean data button");
+                PollutionProvider.cleanAll(getContentResolver());
             }
         });
 

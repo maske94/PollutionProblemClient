@@ -156,18 +156,18 @@ public class PollutionDeviceConnectService extends Service {
 
             if (UUID.fromString(BleConstants.CHARACTERISTIC_TO_DISCOVER).equals(characteristic.getUuid())) {
 
-                //byte[] bytes = characteristic.getValue();
-                Float gpsLat = new Random().nextFloat()+46;
-                byte[] latArray = ByteBuffer.allocate(4).putFloat(gpsLat).array();
-                Float gpsLong = new Random().nextFloat()+8;
-                byte[] longArray = ByteBuffer.allocate(4).putFloat(gpsLong).array();
-
-                Log.e(TAG, "onCharacteristicChanged() ---> generated random position: "+gpsLat+"   "+gpsLong );
-
-                byte[] bytes = {0x01, 0x01, 0x09, 0x0A, 0x0B, 0x0C, // Timestamp
-                        0x52, (byte) 0xB8, 0x1E, 0x3F, // Pollution value
-                        latArray[3], latArray[2], latArray[1], latArray[0], // gps lat
-                        longArray[3], longArray[2], longArray[1], longArray[0]};// gps long
+                byte[] bytes = characteristic.getValue();
+//                Float gpsLat = new Random().nextFloat()+46;
+//                byte[] latArray = ByteBuffer.allocate(4).putFloat(gpsLat).array();
+//                Float gpsLong = new Random().nextFloat()+8;
+//                byte[] longArray = ByteBuffer.allocate(4).putFloat(gpsLong).array();
+//
+//                Log.e(TAG, "onCharacteristicChanged() ---> generated random position: "+gpsLat+"   "+gpsLong );
+//
+//                byte[] bytes = {0x01, 0x01, 0x09, 0x0A, 0x0B, 0x0C, // Timestamp
+//                        0x52, (byte) 0xB8, 0x1E, 0x3F, // Pollution value
+//                        latArray[3], latArray[2], latArray[1], latArray[0], // gps lat
+//                        longArray[3], longArray[2], longArray[1], longArray[0]};// gps long
 
                 //Log.d(TAG, "\t---> received bytes: " + Arrays.toString(bytes));
                 //String str = new String(bytes);

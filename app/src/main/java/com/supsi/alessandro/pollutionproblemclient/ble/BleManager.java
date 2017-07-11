@@ -36,7 +36,7 @@ import java.util.UUID;
  * BLE devices connection/disconnection.
  */
 
-class BleManager {
+public class BleManager {
 
     private static final String TAG = BleManager.class.getSimpleName();
     private static final BleManager mInstance = new BleManager();
@@ -53,7 +53,7 @@ class BleManager {
     /**
      * @return A singleton instance of this class
      */
-    static BleManager getInstance() {
+    public static BleManager getInstance() {
         return mInstance;
     }
 
@@ -74,7 +74,7 @@ class BleManager {
      *
      * @return true if bluetooth is enabled, false otherwise
      */
-    boolean isBleEnabled() {
+    public boolean isBleEnabled() {
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "isBleEnabled() ---> bluetooth adapter NOT initialized");
             return false;
@@ -88,7 +88,7 @@ class BleManager {
      *
      * @param activity activity from where start the new activity
      */
-    void askBleEnabling(Activity activity) {
+    public void askBleEnabling(Activity activity) {
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "askBleEnabling() ---> bluetooth adapter NOT initialized");
             return;
@@ -108,7 +108,7 @@ class BleManager {
      * @param scanSettings Scan settings
      * @param scanCallback Callback to call after the scan
      */
-    void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
+    public void startBleScan(List<ScanFilter> scanFilters, ScanSettings scanSettings, final ScanCallback scanCallback) {
 
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "startBleScan() ---> bluetooth adapter NOT initialized");
@@ -133,7 +133,7 @@ class BleManager {
      *
      * @param scanCallback Callback to call after stop the scan
      */
-    void stopBleScan(ScanCallback scanCallback) {
+    public void stopBleScan(ScanCallback scanCallback) {
         Log.d(TAG, "stopBleScan()");
 
         if(!isBleEnabled()){
@@ -154,7 +154,7 @@ class BleManager {
      * @param device                 The peripheral device
      * @param mBluetoothGattCallback The callback to call after connecting
      */
-    void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
+    public void connectToDevice(BluetoothDevice device, BluetoothGattCallback mBluetoothGattCallback) {
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
             return;
@@ -177,7 +177,7 @@ class BleManager {
      * @return True if the device if found and it's possible to start a connection
      * False if the given address doesn't exist or in not reachable
      */
-    boolean connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
+    public boolean connectToDevice(String deviceAddress, BluetoothGattCallback mBluetoothGattCallback) {
 
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "connectToDevice() ---> bluetooth adapter NOT initialized");
@@ -219,7 +219,7 @@ class BleManager {
      * After using a given BLE device, the app must call this method to ensure resources are
      * released properly.
      */
-    void close() {
+    public void close() {
         if (mBluetoothGatt == null) {
             Log.e(TAG, "close() ---> bluetooth gatt NOT initialized");
             return;
@@ -235,7 +235,7 @@ class BleManager {
      * @param gatt the BluetoothGatt towards perform the request
      * @param c    the characteristic to enable the notification
      */
-    void enableNotification(BluetoothGatt gatt, BluetoothGattCharacteristic c) {
+    public void enableNotification(BluetoothGatt gatt, BluetoothGattCharacteristic c) {
         gatt.setCharacteristicNotification(c, true);
         // Get the configuration descriptor and enable the notification
         // 0x2902 org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
@@ -253,7 +253,7 @@ class BleManager {
      * @param activity The activity from where the request is launched
      * @return True if the permission was already granted, false otherwise
      */
-    boolean askForCoarseLocationPermission(Activity activity) {
+    public boolean askForCoarseLocationPermission(Activity activity) {
         if (android.os.Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},

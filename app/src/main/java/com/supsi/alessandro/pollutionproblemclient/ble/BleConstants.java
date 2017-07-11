@@ -7,15 +7,15 @@ package com.supsi.alessandro.pollutionproblemclient.ble;
 public class BleConstants {
 
     // Activity request codes
-    static final int REQUEST_ENABLE_BT = 1;
+    public static final int REQUEST_ENABLE_BT = 1;
     public static final int POLL_DEVICES_SCAN_ACTIVITY_RESULT = 2;
-    static final int PERMISSIONS_REQUEST_COARSE_LOCATION = 3;
+    public static final int PERMISSIONS_REQUEST_COARSE_LOCATION = 3;
 
-    static final long SCAN_PERIOD = 10000L; // in milliseconds
+    public static final long SCAN_PERIOD = 10000L; // in milliseconds
 
     // Service to discover
-    static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_HEART_MONITOR_UUID;
-    static final String CHARACTERISTIC_TO_DISCOVER = BleConstants.CHARACTERISTIC_HEART_RATE_MEASUREMENT_UUID;
+    public static final String SERVICE_TO_DISCOVER = BleConstants.SERVICE_H10_RADIO_UUID;
+    public static final String CHARACTERISTIC_TO_DISCOVER = BleConstants.CHARACTERISTIC_H10_RADIO_UUID;
 
 
     // Services UUID
