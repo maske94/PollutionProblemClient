@@ -91,12 +91,20 @@ public class Event{
         return gpsLat;
     }
 
+    public double getDoubleGpsLat() {
+        return Double.parseDouble(gpsLat);
+    }
+
     public void setGpsLat(String gpsLat) {
         this.gpsLat = gpsLat;
     }
 
     public String getGpsLong() {
         return gpsLong;
+    }
+
+    public double getDoubleGpsLong() {
+        return Double.parseDouble(gpsLong);
     }
 
     public void setGpsLong(String gpsLong) {
@@ -109,16 +117,16 @@ public class Event{
 
     @Override
     public String toString() {
-        return "Event{" +
-                "eventId='" + eventId + '\'' +
-                ", username='" + username + '\'' +
-                ", childId='" + childId + '\'' +
-                ", pollutionValue='" + pollutionValue + '\'' +
-                ", timeStamp='" + timeStamp + '\'' +
-                ", gpsLat='" + gpsLat + '\'' +
-                ", gpsLong='" + gpsLong + '\'' +
-                ", synced=" + synced +
-                '}';
+        return "{" +
+                "eventId='" + eventId + '\'' + "\n" +
+                "username='" + username + '\'' + "\n" +
+                "childId='" + childId + '\'' + "\n" +
+                "pollValue='" + pollutionValue + '\'' + "\n" +
+                "timeStamp='" + timeStamp + '\'' + "\n" +
+                "gpsLat='" + gpsLat + '\'' + "\n" +
+                "gpsLong='" + gpsLong + '\'' + "\n" +
+                "synced=" + synced +
+                '}' + "\n";
     }
 
     @Override

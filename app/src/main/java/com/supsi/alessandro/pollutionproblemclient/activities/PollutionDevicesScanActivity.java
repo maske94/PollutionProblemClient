@@ -1,4 +1,4 @@
-package com.supsi.alessandro.pollutionproblemclient.ble;
+package com.supsi.alessandro.pollutionproblemclient.activities;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.R;
+import com.supsi.alessandro.pollutionproblemclient.ble.BleConstants;
+import com.supsi.alessandro.pollutionproblemclient.ble.BleManager;
 
 import java.util.ArrayList;
 import java.util.List;
