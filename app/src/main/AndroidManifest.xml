@@ -33,11 +33,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.PollutionDevicesScanActivity">
-        </activity>
-
-        <activity android:name=".activities.PollutionMapActivity">
-        </activity>
+        <activity android:name=".activities.PollutionDevicesScanActivity" />
+        <activity android:name=".activities.PollutionMapActivity" />
+        <activity android:name=".activities.SettingsActivity" />
 
         <service android:name=".ble.PollutionDeviceConnectService" />
 

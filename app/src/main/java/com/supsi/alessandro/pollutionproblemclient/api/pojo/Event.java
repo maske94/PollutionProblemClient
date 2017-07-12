@@ -75,6 +75,10 @@ public class Event{
         return pollutionValue;
     }
 
+    public double getDoublePollutionValue() {
+        return Double.parseDouble(pollutionValue);
+    }
+
     public void setPollutionValue(String pollutionValue) {
         this.pollutionValue = pollutionValue;
     }

@@ -1,110 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragments_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/android_default_padding"
+    android:orientation="vertical"
+    android:weightSum="1"
     tools:context="com.supsi.alessandro.pollutionproblemclient.activities.MainActivity">
 
-    <Button
-        android:id="@+id/b_start_scan"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginLeft="-35dp"
-        android:layout_marginTop="-8dp"
-        android:text="Start scan"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="15sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <!--<Button-->
+    <!--android:id="@+id/b_spots_fragment"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:layout_weight="0.04"-->
+    <!--android:text="Spots fragment"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textSize="15sp" />-->
 
-    <Button
-        android:id="@+id/b_stop_collecting"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="115dp"
-        android:text="Stop collecting"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginRight="0dp"
-        app:layout_constraintRight_toRightOf="parent" />
+    <!--<Button-->
+    <!--android:id="@+id/b_settings_activity"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:layout_weight="0.04"-->
+    <!--android:text="Settings activity"-->
+    <!--android:textAlignment="center"-->
+    <!--android:textAllCaps="false"-->
+    <!--android:textSize="15sp" />-->
 
-    <Button
-        android:id="@+id/b_start_collecting"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginLeft="-50dp"
-        android:layout_marginTop="115dp"
-        android:text="Start collecting"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="20sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/b_start_map"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginLeft="115dp"
-        android:layout_marginTop="0dp"
-        android:text="Start map"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="15sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/b_clear_data"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginLeft="230dp"
-        android:layout_marginTop="0dp"
-        android:text="Clear data"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textSize="15sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_poll_data"
-        android:layout_width="0dp"
-        android:layout_height="300dp"
-        android:background="@android:color/darker_gray"
-        android:maxLines="500"
-        android:scrollbars="vertical"
-        android:gravity="bottom"
-        android:text="@string/label_received_data"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/tv_device_name_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Device:"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="70dp"
-        android:layout_marginLeft="0dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_device_name"
-        android:layout_width="wrap_content"
-        android:layout_height="17dp"
-        android:text="no device"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="70dp"
-        app:layout_constraintLeft_toRightOf="@+id/tv_device_name_label"
-        android:layout_marginLeft="8dp" />
-
-</android.support.constraint.ConstraintLayout>
+</LinearLayout>
