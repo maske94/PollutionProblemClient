@@ -36,6 +36,7 @@
         <activity android:name=".activities.PollutionDevicesScanActivity" />
         <activity android:name=".activities.PollutionMapActivity" />
         <activity android:name=".activities.SettingsActivity" />
+        <activity android:name=".activities.HotCleanSpotsActivity" />
 
         <service android:name=".ble.PollutionDeviceConnectService" />
 

@@ -8,24 +8,24 @@
     android:weightSum="1"
     tools:context="com.supsi.alessandro.pollutionproblemclient.activities.MainActivity">
 
-    <!--<Button-->
-    <!--android:id="@+id/b_spots_fragment"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="50dp"-->
-    <!--android:layout_weight="0.04"-->
-    <!--android:text="Spots fragment"-->
-    <!--android:textAlignment="center"-->
-    <!--android:textAllCaps="false"-->
-    <!--android:textSize="15sp" />-->
+    <Button
+    android:id="@+id/b_spots_fragment"
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:layout_weight="0.04"
+    android:text="Spots fragment"
+    android:textAlignment="center"
+    android:textAllCaps="false"
+    android:textSize="15sp" />
 
-    <!--<Button-->
-    <!--android:id="@+id/b_settings_activity"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="50dp"-->
-    <!--android:layout_weight="0.04"-->
-    <!--android:text="Settings activity"-->
-    <!--android:textAlignment="center"-->
-    <!--android:textAllCaps="false"-->
-    <!--android:textSize="15sp" />-->
+    <Button
+    android:id="@+id/b_settings_activity"
+    android:layout_width="wrap_content"
+    android:layout_height="50dp"
+    android:layout_weight="0.04"
+    android:text="Settings activity"
+    android:textAlignment="center"
+    android:textAllCaps="false"
+    android:textSize="15sp" />
 
 </LinearLayout>

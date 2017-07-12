@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -21,7 +19,6 @@ import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.R;
 import com.supsi.alessandro.pollutionproblemclient.ble.BleConstants;
 import com.supsi.alessandro.pollutionproblemclient.ble.PollutionDeviceConnectService;
-import com.supsi.alessandro.pollutionproblemclient.fragments.HotCleanSpotsFragment;
 import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
 
 public class SettingsActivity extends AppCompatActivity {

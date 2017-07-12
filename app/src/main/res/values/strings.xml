@@ -5,4 +5,5 @@
     <string name="label_received_data">Received data:\n</string>
     <string name="google_api_key">AIzaSyDjW0O1_BOUJTUVw7VTZk7jWJhswnatWBY</string>
     <string name="hot_spots_label">Hot spots</string>
+    <string name="clean_spots_label">Clean spots </string>
 </resources>

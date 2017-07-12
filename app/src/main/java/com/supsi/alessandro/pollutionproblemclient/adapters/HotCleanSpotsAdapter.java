@@ -1,5 +1,6 @@
 package com.supsi.alessandro.pollutionproblemclient.adapters;
 
+import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,10 +13,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 import com.supsi.alessandro.pollutionproblemclient.R;
+import com.supsi.alessandro.pollutionproblemclient.activities.PollutionMapActivity;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 
 import java.util.List;
@@ -27,11 +30,13 @@ import java.util.List;
 public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdapter.EventViewHolder> {
 
     private static final String TAG = HotCleanSpotsAdapter.class.getSimpleName();
+    private final Activity mActivity;
 
     private List<Event> mDataSet;
 
-    public HotCleanSpotsAdapter(List<Event> dataSet){
-        this.mDataSet=dataSet;
+    public HotCleanSpotsAdapter(Activity activity, List<Event> dataSet) {
+        this.mActivity = activity;
+        this.mDataSet = dataSet;
     }
 
     @Override
@@ -46,26 +51,29 @@ public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdap
     public void onBindViewHolder(HotCleanSpotsAdapter.EventViewHolder holder, int position) {
         //Update the cards values
         holder.text.setText(mDataSet.get(position).getPollutionValue());
-
-
-        LatLng gpsPosition = new LatLng(mDataSet.get(position).getDoubleGpsLat(),mDataSet.get(position).getDoubleGpsLong());
-        holder.mapView.setTag(gpsPosition);
+        holder.mapView.setTag(mDataSet.get(position));
 
         // Ensure the map has been initialised by the on map ready callback in ViewHolder.
         // If it is not ready yet, it will be initialised with the NamedLocation set as its tag
         // when the callback is received.
         if (holder.map != null) {
             // The map is already ready to be used
-            setMapLocation(holder.map, gpsPosition);
+            addMarker(holder.map, mDataSet.get(position));
         }
         holder.mapView.onResume();
     }
 
-    private static void setMapLocation(GoogleMap map, LatLng position) {
-        Log.d(TAG, "setMapLocation: ");
+    private static void addMarker(GoogleMap map, Event e) {
+        Log.d(TAG, "addMarker: ");
+
+        LatLng gpsPosition = new LatLng(e.getDoubleGpsLat(), e.getDoubleGpsLong());
+        float pollValue = Float.parseFloat(e.getPollutionValue());
+
         // Add a marker for this item and set the camera
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15f));
-        map.addMarker(new MarkerOptions().position(position));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(gpsPosition, 15f));
+        map.addMarker(new MarkerOptions().position(gpsPosition)
+                .icon(BitmapDescriptorFactory.defaultMarker(PollutionMapActivity.getColor(pollValue)))
+        );
 
         // Set the map type back to normal.
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -76,10 +84,10 @@ public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdap
         return mDataSet.size();
     }
 
-        /**
+    /**
      *
      */
-    public class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, OnMapReadyCallback{
+    public class EventViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
         MapView mapView;
         TextView text;
@@ -95,18 +103,24 @@ public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdap
 
         @Override
         public void onClick(View view) {
-            Log.d(TAG, "onClick: ");
+            Log.d(TAG, "onClick: TOUCHED ELEMENT " + getAdapterPosition());
+            Event e = mDataSet.get(getAdapterPosition());
+            LatLng position = new LatLng(e.getDoubleGpsLat(), e.getDoubleGpsLong());
+            PollutionMapActivity.startWithInitialLocation(mActivity, position);
         }
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
             MapsInitializer.initialize(PollutionApplication.getAppContext());
             map = googleMap;
-            LatLng data = (LatLng) mapView.getTag();
-            if (data != null) {
-                setMapLocation(map, data);
+            map.getUiSettings().setMapToolbarEnabled(false);
+            map.setOnMapClickListener(this);
+            Event event = (Event) mapView.getTag();
+            if (event != null) {
+                addMarker(map,event );
             }
         }
+
 
         /**
          * Initialises the MapView by calling its lifecycle methods.
@@ -118,6 +132,11 @@ public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdap
                 // Set the map ready callback to receive the GoogleMap object
                 mapView.getMapAsync(this);
             }
+        }
+
+        @Override
+        public void onMapClick(LatLng latLng) {
+
         }
     }
 

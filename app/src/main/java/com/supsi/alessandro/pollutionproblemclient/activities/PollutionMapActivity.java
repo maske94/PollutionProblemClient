@@ -1,5 +1,7 @@
 package com.supsi.alessandro.pollutionproblemclient.activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.os.Bundle;
 import android.os.RemoteException;
@@ -13,6 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 import com.supsi.alessandro.pollutionproblemclient.R;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
@@ -26,12 +29,25 @@ import java.util.ArrayList;
 public class PollutionMapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = PollutionMapActivity.class.getSimpleName();
+    private static final String INTENT_INITIAL_LOCATION = "initialLocation";
+
+    private LatLng mInitialLocation=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_map);
+
+        /**
+         * Check if this activity has been started with some parameters
+         * to define the initial position of the camera.
+         */
+        Intent i = getIntent();
+        if(i != null && i.hasExtra(INTENT_INITIAL_LOCATION)) {
+            Log.d(TAG, "onCreate: GOT INITIAL POSITION;");
+            mInitialLocation = i.getParcelableExtra(INTENT_INITIAL_LOCATION);
+        }
 
         // Test: add some events to db
 //        try {
@@ -92,9 +108,14 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
                     .icon(BitmapDescriptorFactory.defaultMarker(getColor(Float.parseFloat(e.getPollutionValue())))));
         }
 
-        LatLng lugano = new LatLng(46.0036778d,8.951052000000004d);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(lugano));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        LatLng position;
+        if(mInitialLocation!=null){
+            position = mInitialLocation;
+        }else {
+            position = new LatLng(46.0036778d, 8.951052000000004d);// Lugano
+        }
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
 
     /**
@@ -107,7 +128,7 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
      * @param pollValue The given pollution value.
      * @return A float representing the color on a color wheel.
      */
-    private float getColor(float pollValue){
+    public static float getColor(float pollValue){
         if(pollValue <= 12.0f){
             Log.d(TAG, "getColor: Good");
             return BitmapDescriptorFactory.HUE_GREEN;
@@ -129,6 +150,17 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
         }
     }
 
+    /**
+     * Start this activity providing it with a initial location.
+     *
+     * @param mActivity Activity from where start the new one.
+     * @param initialLocation The initial location where to locate the camera.
+     */
+    public static void startWithInitialLocation(Activity mActivity, LatLng initialLocation){
+        Intent i = new Intent(mActivity,PollutionMapActivity.class);
+        i.putExtra(INTENT_INITIAL_LOCATION,initialLocation);
+        mActivity.startActivity(i);
+    }
 
 }
 
