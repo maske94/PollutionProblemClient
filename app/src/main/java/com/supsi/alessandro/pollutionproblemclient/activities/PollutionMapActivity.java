@@ -15,7 +15,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
 import com.supsi.alessandro.pollutionproblemclient.R;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
@@ -32,12 +31,21 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
     private static final String INTENT_INITIAL_LOCATION = "initialLocation";
 
     private LatLng mInitialLocation=null;
+    private ArrayList<Event> events;
+
+    /**
+     * Boolean volatile variable used to understand
+     * when the background thread has finished to
+     * load data from the content provider
+     */
+    private volatile boolean areEventsReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_map);
+        areEventsReady = false;
 
         /**
          * Check if this activity has been started with some parameters
@@ -49,17 +57,25 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
             mInitialLocation = i.getParcelableExtra(INTENT_INITIAL_LOCATION);
         }
 
-        // Test: add some events to db
-//        try {
-//            addEvents();
-//        } catch (RemoteException | OperationApplicationException e) {
-//            e.printStackTrace();
-//        }
-
         // Get the SupportMapFragment and request notification when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        /**
+         * Load from content provider the events to be shown on the map
+         */
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, "run: PID "+Thread.currentThread().getId()+" before " +System.currentTimeMillis());
+                events = PollutionProvider.getEvents("maske94", "prova", null, null, getContentResolver());
+                areEventsReady = true;
+                Log.d(TAG, "run: PID: "+Thread.currentThread().getId()+" after " +System.currentTimeMillis());
+
+            }
+        }).start();
+
+        Log.d(TAG, "onCreate: PID:"+Thread.currentThread().getId()+"   " +System.currentTimeMillis());
     }
 
     private void addEvents() throws RemoteException, OperationApplicationException {
@@ -83,20 +99,17 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady: PID:"+Thread.currentThread().getId()+"   " +System.currentTimeMillis());
 
-        /**
-         * Load from content provider the events to be shown on the map
-         */
-        ArrayList<Event> events = PollutionProvider.getEvents("maske94", "prova", null, null, getContentResolver());
-
-        if (events == null) {
-            Log.e(TAG, "onMapReady() --> no EVENTS for the current username and child id");
-            return;
+        // Wait for the other thread to populate the events array list of events
+        while(!areEventsReady) {
+            //Log.e(TAG, "onMapReady() --> waiting for background thread to collect data from db");
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
-//        LatLng sydney = new LatLng(-33.852, 151.211);
-//        googleMap.addMarker(new MarkerOptions().position(sydney)
-//                .title("Marker in Sydney"));
 
         /**
          * Add a new marker for each event previously loaded
@@ -116,6 +129,7 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
     }
 
     /**
@@ -130,22 +144,22 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
      */
     public static float getColor(float pollValue){
         if(pollValue <= 12.0f){
-            Log.d(TAG, "getColor: Good");
+           // Log.d(TAG, "getColor: Good");
             return BitmapDescriptorFactory.HUE_GREEN;
         }else if(pollValue <= 35.4f){
-            Log.d(TAG, "getColor: Moderate");
+           // Log.d(TAG, "getColor: Moderate");
             return BitmapDescriptorFactory.HUE_YELLOW;
         }else if(pollValue <= 55.4f){
-            Log.d(TAG, "getColor: Unhealthy for Sensitive Groups");
+           // Log.d(TAG, "getColor: Unhealthy for Sensitive Groups");
             return BitmapDescriptorFactory.HUE_ORANGE;
         }else if(pollValue <= 150.4f){
-            Log.d(TAG, "getColor: Unhealthy");
+            //Log.d(TAG, "getColor: Unhealthy");
             return BitmapDescriptorFactory.HUE_RED;
         }else if(pollValue <= 250.4f){
-            Log.d(TAG, "getColor: Very Unhealthy");
+            //Log.d(TAG, "getColor: Very Unhealthy");
             return BitmapDescriptorFactory.HUE_VIOLET;
         }else{
-            Log.d(TAG, "getColor: Hazardous");
+           // Log.d(TAG, "getColor: Hazardous");
             return BitmapDescriptorFactory.HUE_VIOLET-20;
         }
     }

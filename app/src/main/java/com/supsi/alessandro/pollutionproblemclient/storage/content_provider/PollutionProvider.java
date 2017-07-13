@@ -322,7 +322,7 @@ public class PollutionProvider extends ContentProvider {
 
         ArrayList<Event> events = buildEventsFromCursor(c);
         c.close();
-        Log.d(TAG, "getEvents() ---> selected events: "+events);
+        Log.v(TAG, "getEvents() ---> selected events: "+events);
         return events;
     }
 
