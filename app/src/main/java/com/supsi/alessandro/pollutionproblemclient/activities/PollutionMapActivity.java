@@ -118,7 +118,7 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
             position = new LatLng(46.0036778d, 8.951052000000004d);// Lugano
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(position));
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(13));
 
     }
 

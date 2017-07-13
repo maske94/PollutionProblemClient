@@ -6,4 +6,10 @@
     <string name="google_api_key">AIzaSyDjW0O1_BOUJTUVw7VTZk7jWJhswnatWBY</string>
     <string name="hot_spots_label">Hot spots</string>
     <string name="clean_spots_label">Clean spots </string>
+    <string name="title_activity_drawer">DrawerActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
