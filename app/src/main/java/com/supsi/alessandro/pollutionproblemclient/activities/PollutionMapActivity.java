@@ -78,16 +78,6 @@ public class PollutionMapActivity extends AppCompatActivity implements OnMapRead
         Log.d(TAG, "onCreate: PID:"+Thread.currentThread().getId()+"   " +System.currentTimeMillis());
     }
 
-    private void addEvents() throws RemoteException, OperationApplicationException {
-        ArrayList<Event> events = new ArrayList<>();
-        events.add(new Event("maske94", "prova", "10", "2017-06-22T22:03:00", "46.0085418", "8.951052000000004"));
-        events.add(new Event("maske94", "prova", "20", "2017-06-22T22:03:00", "46.0185418", "8.951052000000004"));
-        events.add(new Event("maske94", "prova", "40", "2017-06-22T22:03:00", "46.0285418", "8.951052000000004"));
-        events.add(new Event("maske94", "prova", "70", "2017-06-22T22:03:00", "46.0385418", "8.951052000000004"));
-        events.add(new Event("maske94", "prova", "200", "2017-06-22T22:03:00", "46.0485418", "8.951052000000004"));
-        events.add(new Event("maske94", "prova", "300", "2017-06-22T22:03:00", "46.0585418", "8.951052000000004"));
-        PollutionProvider.storeEvents(events, getContentResolver());
-    }
 
     /**
      * Manipulates the map when it's available.

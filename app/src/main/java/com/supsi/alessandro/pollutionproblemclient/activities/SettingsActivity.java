@@ -6,9 +6,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.OperationApplicationException;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -17,9 +19,12 @@ import android.widget.TextView;
 
 import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.R;
+import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 import com.supsi.alessandro.pollutionproblemclient.ble.BleConstants;
 import com.supsi.alessandro.pollutionproblemclient.ble.PollutionDeviceConnectService;
 import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
+
+import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -84,6 +89,14 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "onClick() ---> clicked clean data button");
                 PollutionProvider.cleanAll(getContentResolver());
+            }
+        });
+
+        findViewById(R.id.b_add_random_data).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick() ---> clicked add random data button");
+               addEvents();
             }
         });
 
@@ -158,9 +171,25 @@ public class SettingsActivity extends AppCompatActivity {
         }
     };
 
-    private static IntentFilter makeGattUpdateIntentFilter() {
+    private IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_POLLUTION_UPDATE);
         return intentFilter;
     }
+
+    private void addEvents()   {
+        ArrayList<Event> events = new ArrayList<>();
+        events.add(new Event("maske94", "prova", "10", "2017-06-22T22:03:00", "46.0085418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "20", "2017-06-22T22:03:00", "46.0185418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "40", "2017-06-22T22:03:00", "46.0285418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "70", "2017-06-22T22:03:00", "46.0385418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "200", "2017-06-22T22:03:00", "46.0485418", "8.951052000000004"));
+        events.add(new Event("maske94", "prova", "300", "2017-06-22T22:03:00", "46.0585418", "8.951052000000004"));
+        try {
+            PollutionProvider.storeEvents(events, getContentResolver());
+        } catch (RemoteException | OperationApplicationException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
