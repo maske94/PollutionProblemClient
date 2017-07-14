@@ -42,7 +42,7 @@ public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdap
     @Override
     public HotCleanSpotsAdapter.EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.card_view_layout, parent, false);
+                .inflate(R.layout.event_card_view_layout, parent, false);
         return new EventViewHolder(view);
 
     }
@@ -95,7 +95,7 @@ public class HotCleanSpotsAdapter extends RecyclerView.Adapter<HotCleanSpotsAdap
 
         public EventViewHolder(View itemView) {
             super(itemView);
-            text = (TextView) itemView.findViewById(R.id.info_text);
+            text = (TextView) itemView.findViewById(R.id.tv_child_description);
             mapView = (MapView) itemView.findViewById(R.id.map_view);
             initializeMapView();
             itemView.setOnClickListener(this);

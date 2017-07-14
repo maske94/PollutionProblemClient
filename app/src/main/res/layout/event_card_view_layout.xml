@@ -35,7 +35,7 @@
                 map:mapType="none" />
 
             <TextView
-                android:id="@+id/info_text"
+                android:id="@+id/tv_child_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/map_view"
