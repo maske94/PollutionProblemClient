@@ -11,11 +11,13 @@ import android.content.OperationApplicationException;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.supsi.alessandro.pollutionproblemclient.Constants;
 import com.supsi.alessandro.pollutionproblemclient.PollutionApplication;
+import com.supsi.alessandro.pollutionproblemclient.api.pojo.Child;
 import com.supsi.alessandro.pollutionproblemclient.api.pojo.Event;
 import com.supsi.alessandro.pollutionproblemclient.storage.content_provider.PollutionProvider;
 
@@ -24,7 +26,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -38,6 +39,8 @@ public class PollutionDeviceConnectService extends Service {
     private static final String TAG = PollutionDeviceConnectService.class.getSimpleName();
     private BleManager mBleManager;
     private ArrayList<Event> mEvents;
+    private String mChildId;
+
 
     /**
      * Service binding related stuffs
@@ -69,7 +72,7 @@ public class PollutionDeviceConnectService extends Service {
         // Store into the local db all the events that this service has gathered
         try {
             Log.d(TAG, "onUnbind() ---> storing all the events received from the wearable device");
-            PollutionProvider.storeEvents(mEvents,getContentResolver());
+            PollutionProvider.storeEvents(mEvents, getContentResolver());
         } catch (RemoteException | OperationApplicationException e) {
             e.printStackTrace();
         }
@@ -85,7 +88,20 @@ public class PollutionDeviceConnectService extends Service {
      * @param device The device which connect to
      */
     public void connectPollutionDevice(BluetoothDevice device) {
+
         mBleManager.connectToDevice(device, new BleConnectionCallback());
+    }
+
+    /**
+     * Try to connect to the device to download data of the given child.
+     *
+     * @param child Child to download data.
+     * @return True if the service starts the downloading process with success, false otherwise
+     */
+    public boolean downloadChildData(@NonNull Child child) {
+        mChildId = child.getChildId();
+        Log.d(TAG, "downloadChildData: start downloading data for children with id: " + mChildId + " and name " + child.getFirstName() + " and device address: " + child.getDeviceId());
+        return mBleManager.connectToDevice(child.getDeviceId(), new BleConnectionCallback());
     }
 
     /**
@@ -180,8 +196,8 @@ public class PollutionDeviceConnectService extends Service {
                         //Log.v(TAG, String.format("%02X ", byteChar));
                     }
                     Log.i(TAG, "onCharacteristicChanged() --> read string: " + stringBuilder);
-                   //Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(), PollutionApplication.getChildId(gatt.getDevice().getAddress()), bytes);
-                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(),"prova", bytes);
+
+                    Event event = buildEventFromBytesArray(PollutionApplication.getLoggedUsername(), mChildId==null ? "prova" : mChildId, bytes);
 
                     if (event == null) {
                         Log.e(TAG, "onCharacteristicChanged() ---> event is NULL");

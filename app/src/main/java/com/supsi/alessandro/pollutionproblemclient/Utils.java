@@ -8,6 +8,12 @@ import android.os.Vibrator;
  */
 
 public class Utils {
+
+    /**
+     * Emits a vibration that lasts for the given milliseconds parameter.
+     *
+     * @param milliseconds Vibration duration.
+     */
     public static void vibrate(long milliseconds) {
         Context context = PollutionApplication.getAppContext();
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);

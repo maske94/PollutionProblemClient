@@ -19,7 +19,6 @@ import android.view.View;
 import com.supsi.alessandro.pollutionproblemclient.R;
 import com.supsi.alessandro.pollutionproblemclient.Utils;
 import com.supsi.alessandro.pollutionproblemclient.adapters.ChildrenListAdapter;
-import com.supsi.alessandro.pollutionproblemclient.adapters.HotCleanSpotsAdapter;
 import com.supsi.alessandro.pollutionproblemclient.storage.PollutionSharedPreferences;
 
 public class MainActivity extends AppCompatActivity
@@ -59,8 +58,6 @@ public class MainActivity extends AppCompatActivity
         mKidsListRecyclerView = (RecyclerView) findViewById(R.id.kids_recycler_view);
         mKidsListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mKidsListRecyclerView.setAdapter(new ChildrenListAdapter(PollutionSharedPreferences.getInstance().getStoredChildrenList()));
-
-
     }
 
     @Override
